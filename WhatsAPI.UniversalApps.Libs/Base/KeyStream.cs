@@ -12,13 +12,13 @@ namespace WhatsAPI.UniversalApps.Libs.Base
         public const string AuthMethod = "WAUTH-2";
         private const int Drop = 768;
         private RC4 rc4;
-        private HMACSHA1 mac;
+        private SHA1 mac;
         private uint seq;
 
         public KeyStream(byte[] key, byte[] macKey)
         {
             this.rc4 = new RC4(key, 768);
-            this.mac = new HMACSHA1(macKey);
+            this.mac = new SHA1(macKey);
         }
 
         public static byte[][] GenerateKeys(byte[] password, byte[] nonce)
@@ -69,18 +69,18 @@ namespace WhatsAPI.UniversalApps.Libs.Base
 
         private byte[] ComputeMac(byte[] buffer, int offset, int length)
         {
-            this.mac.Initialize();
-            this.mac.TransformBlock(buffer, offset, length, buffer, offset);
-            byte[] array = new byte[]
-            {
-                (byte)(this.seq >> 24),
-                (byte)(this.seq >> 16),
-                (byte)(this.seq >> 8),
-                (byte)this.seq
-            };
-            this.mac.TransformFinalBlock(array, 0, array.Length);
-            this.seq += 1u;
-            return this.mac.Hash;
+            //this.mac.Initialize();
+            //this.mac.TransformBlock(buffer, offset, length, buffer, offset);
+            //byte[] array = new byte[]
+            //{
+            //    (byte)(this.seq >> 24),
+            //    (byte)(this.seq >> 16),
+            //    (byte)(this.seq >> 8),
+            //    (byte)this.seq
+            //};
+            //this.mac.TransformFinalBlock(array, 0, array.Length);
+            //this.seq += 1u;
+            //return this.mac.Hash;
         }
     }
 }
