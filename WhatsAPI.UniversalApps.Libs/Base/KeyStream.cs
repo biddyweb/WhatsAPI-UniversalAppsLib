@@ -49,7 +49,7 @@ namespace WhatsAPI.UniversalApps.Libs.Base
 
         public void DecodeMessage(byte[] buffer, int macOffset, int offset, int length)
         {
-            byte[] array = this.ComputeMac(buffer, offset, length);
+            byte[] array = SHA1.Encrypt(buffer);//this.ComputeMac(buffer, offset, length);
             for (int i = 0; i < 4; i++)
             {
                 if (buffer[macOffset + i] != array[i])
@@ -63,12 +63,12 @@ namespace WhatsAPI.UniversalApps.Libs.Base
         public void EncodeMessage(byte[] buffer, int macOffset, int offset, int length)
         {
             this.rc4.Cipher(buffer, offset, length);
-            byte[] array = this.ComputeMac(buffer, offset, length);
+            byte[] array = SHA1.Encrypt(buffer);//, offset, length);
             Array.Copy(array, 0, buffer, macOffset, 4);
         }
 
-        private byte[] ComputeMac(byte[] buffer, int offset, int length)
-        {
+        //private byte[] ComputeMac(byte[] buffer, int offset, int length)
+        //{
             //this.mac.Initialize();
             //this.mac.TransformBlock(buffer, offset, length, buffer, offset);
             //byte[] array = new byte[]
@@ -81,6 +81,6 @@ namespace WhatsAPI.UniversalApps.Libs.Base
             //this.mac.TransformFinalBlock(array, 0, array.Length);
             //this.seq += 1u;
             //return this.mac.Hash;
-        }
+        //}
     }
 }

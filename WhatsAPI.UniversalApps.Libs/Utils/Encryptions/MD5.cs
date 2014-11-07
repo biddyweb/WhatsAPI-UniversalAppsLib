@@ -18,5 +18,14 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Encryptions
             var res = CryptographicBuffer.EncodeToHexString(hashed);
             return res;
         }
+
+        public static string Encrypt(byte[] str)
+        {
+            var alg = HashAlgorithmProvider.OpenAlgorithm("MD5");
+            var buff = CryptographicBuffer.CreateFromByteArray(str);
+            var hashed = alg.HashData(buff);
+            var res = CryptographicBuffer.EncodeToHexString(hashed);
+            return res;
+        }
     }
 }

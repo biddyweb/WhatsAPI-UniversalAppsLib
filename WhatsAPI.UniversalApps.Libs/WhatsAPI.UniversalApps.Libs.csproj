@@ -5,7 +5,7 @@
     <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{bbdf534a-0d6c-46b2-93c4-8f7eebafd8ba}</ProjectGuid>
+    <ProjectGuid>{BBDF534A-0D6C-46B2-93C4-8F7EEBAFD8BA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WhatsAPI.UniversalApps.Libs</RootNamespace>
@@ -35,14 +35,35 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
+    <EmbeddedResource Include="Files\countries.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <TargetPlatform Include="WindowsPhoneApp, Version=8.1" />
     <TargetPlatform Include="Windows, Version=8.1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Base\KeyStream.cs" />
+    <Compile Include="Base\KeyValue.cs" />
+    <Compile Include="Constants\Information.cs" />
+    <Compile Include="Constants\Token.cs" />
+    <Compile Include="Core\Registration\Register.cs" />
+    <Compile Include="Core\Registration\Token.cs" />
+    <Compile Include="Extensions\CultureInfoExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Models\PhoneNumber.cs" />
+    <Compile Include="Models\RegisterResponse.cs" />
+    <Compile Include="Utils\Common\FileHelper.cs" />
+    <Compile Include="Utils\Common\Helpers.cs" />
+    <Compile Include="Utils\Common\HttpRequest.cs" />
+    <Compile Include="Utils\Encryptions\MD5.cs" />
+    <Compile Include="Utils\Encryptions\PKBDF.cs" />
+    <Compile Include="Utils\Encryptions\SHA1.cs" />
+    <Compile Include="WhatsApp.cs" />
+    <Compile Include="Events\WhatsAppEventListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\Encryptions\RC4.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -52,5 +73,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-
 </Project>
