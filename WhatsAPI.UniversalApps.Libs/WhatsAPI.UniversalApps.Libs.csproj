@@ -35,9 +35,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <EmbeddedResource Include="Files\countries.csv">
+    <Content Include="Files\countries.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <TargetPlatform Include="WindowsPhoneApp, Version=8.1" />
@@ -46,20 +46,27 @@
   <ItemGroup>
     <Compile Include="Base\KeyStream.cs" />
     <Compile Include="Base\KeyValue.cs" />
+    <Compile Include="Constants\Enums.cs" />
     <Compile Include="Constants\Information.cs" />
     <Compile Include="Constants\Token.cs" />
     <Compile Include="Core\Registration\Register.cs" />
     <Compile Include="Core\Registration\Token.cs" />
     <Compile Include="Extensions\CultureInfoExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Models\AccountInfo.cs" />
     <Compile Include="Models\PhoneNumber.cs" />
     <Compile Include="Models\RegisterResponse.cs" />
+    <Compile Include="Models\TokenMap.cs" />
+    <Compile Include="Models\User.cs" />
     <Compile Include="Utils\Common\FileHelper.cs" />
     <Compile Include="Utils\Common\Helpers.cs" />
     <Compile Include="Utils\Common\HttpRequest.cs" />
+    <Compile Include="Utils\Common\StringManipulation.cs" />
     <Compile Include="Utils\Encryptions\MD5.cs" />
     <Compile Include="Utils\Encryptions\PKBDF.cs" />
     <Compile Include="Utils\Encryptions\SHA1.cs" />
+    <Compile Include="Utils\Logger\Log.cs" />
+    <Compile Include="Utils\Messaging\TicketManager.cs" />
     <Compile Include="WhatsApp.cs" />
     <Compile Include="Events\WhatsAppEventListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

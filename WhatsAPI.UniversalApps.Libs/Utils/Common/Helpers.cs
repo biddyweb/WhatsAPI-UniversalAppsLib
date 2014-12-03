@@ -38,5 +38,78 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             }
             return sb.ToString();
         }
+
+        public static bool IsShort(string value)
+        {
+            return value.Length < 256;
+        }
+        public static int StrLenWa(string str)
+        {
+            int len = str.Length;
+            if (len >= 256)
+                len = len & 0xFF00 >> 8;
+            return len;
+        }
+        public static string _hex(int val)
+        {
+            return (val.ToString("X").Length % 2 == 0) ? val.ToString("X") : ("0" + val.ToString("X"));
+        }
+        public static string RandomUUID()
+        {
+            var mt_rand = new Random();
+            return string.Format("{0}{1}-{2}-{3}-{4}-{5}{6}{7}",
+            mt_rand.Next(0, 0xffff), mt_rand.Next(0, 0xffff),
+            mt_rand.Next(0, 0xffff),
+            mt_rand.Next(0, 0x0fff) | 0x4000,
+            mt_rand.Next(0, 0x3fff) | 0x8000,
+            mt_rand.Next(0, 0xffff), mt_rand.Next(0, 0xffff), mt_rand.Next(0, 0xffff)
+            );
+        }
+      
+        public static long GetUnixTimestamp(DateTime value)
+        {
+            TimeSpan span = (value - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
+            return (long)span.TotalSeconds;
+        }
+
+        public static long GetNowUnixTimestamp()
+        {
+            return GetUnixTimestamp(DateTime.UtcNow);
+        }
+
+        public static bool ArrayEqual(byte[] b1, byte[] b2)
+        {
+            int len = b1.Length;
+            if (b1.Length != b2.Length)
+                return false;
+            for (int i = 0; i < len; i++)
+            {
+                if (b1[i] != b2[i])
+                    return false;
+            }
+            return true;
+        }
+
+#region Jid Helper
+        public static string GetJID(string target)
+        {
+            target = target.TrimStart(new char[] { '+', '0' });
+            if (!target.Contains('@'))
+            {
+                //check if group message
+                if (target.Contains('-'))
+                {
+                    //to group
+                    target += "@g.us";
+                }
+                else
+                {
+                    //to normal user
+                    target += "@s.whatsapp.net";
+                }
+            }
+            return target;
+        }
+#endregion
     }
 }

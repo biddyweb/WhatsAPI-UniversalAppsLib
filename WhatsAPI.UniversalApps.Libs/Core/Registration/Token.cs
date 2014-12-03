@@ -25,12 +25,13 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
                 ipad[i] = (byte)(ipad[i] ^ key[i]);
             }
 
-           
+
 
             ipad.AddRange(data);
-            data = new List<byte>(SHA1.Encrypt(ipad.ToArray()));
+            var ipadString = Encoding.GetEncoding("iso-8859-1").GetString(ipad.ToArray(), 0, ipad.ToArray().Length);
+            data = new List<byte>(SHA1.EncryptBase64(ipad.ToArray()));
             opad.AddRange(data);
-            data = new List<byte>(SHA1.Encrypt(opad.ToArray()));
+            data = new List<byte>(SHA1.EncryptBase64(opad.ToArray()));
 
             return Convert.ToBase64String(data.ToArray());
         }

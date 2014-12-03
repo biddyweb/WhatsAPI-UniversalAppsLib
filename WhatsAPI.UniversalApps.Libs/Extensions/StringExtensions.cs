@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using WhatsAPI.UniversalApps.Libs.Utils.Common;
 using WhatsAPI.UniversalApps.Libs.Utils.Encryptions;
 
 namespace WhatsAPI.UniversalApps.Libs.Extensions
@@ -21,12 +22,6 @@ namespace WhatsAPI.UniversalApps.Libs.Extensions
             return MD5.Encrypt(s);
         }
 
-        public static string ToMD5String(this String s)
-        {
-            return MD5.Encrypt(s);
-        }
-
-
         public static string ToShaString(this IEnumerable<char> s)
         {
             return new string(s.ToArray()).ToShaString();
@@ -34,9 +29,9 @@ namespace WhatsAPI.UniversalApps.Libs.Extensions
 
         public static string ToShaString(this String s)
         {
-            var data = SHA1.Encrypt(s);
-            var str = Encoding.GetEncoding("iso-8859-1").GetString(data, 0, data.Length);
-            return System.Uri.EscapeDataString(str).ToLower();
+            var data = SHA1.EncryptBase64(s);
+            var str = StringManipulation.UrlEncode(Encoding.GetEncoding("iso-8859-1").GetString(data, 0, data.Length));
+            return str;
         }
 
         public static string GetJsonValue(this string s, string parameter)

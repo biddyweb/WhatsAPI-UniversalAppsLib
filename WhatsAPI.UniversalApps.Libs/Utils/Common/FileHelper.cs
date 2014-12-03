@@ -18,5 +18,7 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             Stream stream = randomAccessStream.AsStreamForRead();
             return stream;
         }
+
+
     }
 }

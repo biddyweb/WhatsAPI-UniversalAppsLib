@@ -23,12 +23,7 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             var response = await httpClient.SendAsync(httpRequestMessage);
             response.EnsureSuccessStatusCode();
             var res = await response.Content.ReadAsStringAsync();
-#if DEBUG
-            var sb = new StringBuilder();
-            sb.AppendLine("Url : " + uri);
-            sb.AppendLine("Result : " + res);
-            System.Diagnostics.Debug.WriteLine(string.Format("Request to Whatsapp Web Service Log : {0}{1}", Environment.NewLine, sb));
-#endif
+            Logger.Log.Write(res, uri);
             return res;
         }
 

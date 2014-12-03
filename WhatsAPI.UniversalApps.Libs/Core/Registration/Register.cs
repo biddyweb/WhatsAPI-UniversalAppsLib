@@ -26,6 +26,10 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
 
         public static async Task<RegisterResponse> RequestCode(string phoneNumber, string method = "sms", string id = null)
         {
+            if (phoneNumber.Contains("+"))
+            {
+                phoneNumber = phoneNumber.Replace("+", "");
+            }
             string response = null;
             string password = null;
             string request = null;
