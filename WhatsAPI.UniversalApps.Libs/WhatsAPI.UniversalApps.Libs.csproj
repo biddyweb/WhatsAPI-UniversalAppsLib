@@ -44,25 +44,41 @@
     <TargetPlatform Include="Windows, Version=8.1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\FMessage.cs" />
+    <Compile Include="Base\FMessageVisitor.cs" />
     <Compile Include="Base\KeyStream.cs" />
     <Compile Include="Base\KeyValue.cs" />
+    <Compile Include="Base\ProtocolTreeNode.cs" />
     <Compile Include="Constants\Enums.cs" />
     <Compile Include="Constants\Information.cs" />
     <Compile Include="Constants\Token.cs" />
+    <Compile Include="Core\Connection\Sockets.cs" />
     <Compile Include="Core\Encryption\HashAlgorithm.cs" />
     <Compile Include="Core\Encryption\ICryptoTransform.cs" />
+    <Compile Include="Core\Encryption\KeyedHashAlgorithm.cs" />
+    <Compile Include="Core\Encryption\KeyNumber.cs" />
+    <Compile Include="Core\Encryption\KeySizes.cs" />
     <Compile Include="Core\Encryption\SHA1\SHA1.cs" />
     <Compile Include="Core\Encryption\SHA1\SHA1CryptoProvider.cs" />
     <Compile Include="Core\Encryption\SHA1\SHA1Managed.cs" />
+    <Compile Include="Core\Events\EventBase.cs" />
+    <Compile Include="Core\Exceptions\ConnectionException.cs" />
+    <Compile Include="Core\Messaging\MessagingBase.cs" />
+    <Compile Include="Core\Messaging\SendMessageBase.cs" />
     <Compile Include="Core\Registration\Register.cs" />
     <Compile Include="Core\Registration\Token.cs" />
     <Compile Include="Extensions\CultureInfoExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Models\AccountInfo.cs" />
+    <Compile Include="Models\GroupInfo.cs" />
+    <Compile Include="Models\GroupSetting.cs" />
     <Compile Include="Models\PhoneNumber.cs" />
     <Compile Include="Models\RegisterResponse.cs" />
     <Compile Include="Models\TokenMap.cs" />
+    <Compile Include="Models\UploadResponse.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Utils\Common\BinTreeNodeWriter.cs" />
+    <Compile Include="Utils\Common\BinTreeNodeReader.cs" />
     <Compile Include="Utils\Common\FileHelper.cs" />
     <Compile Include="Utils\Common\Helpers.cs" />
     <Compile Include="Utils\Common\HttpRequest.cs" />

@@ -8,6 +8,21 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <Button x:Name="btnRegister" Content="Register" HorizontalAlignment="Center" Click="btnRegister_Click"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
+            <TextBox PlaceholderText="Input your verification code from Whatsapp" Margin="12" x:Name="txtCode"></TextBox>
+            <Button x:Name="btnConfirm" Content="Verify" Margin="12" Click="btnConfirm_Click"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center">
+            <TextBox PlaceholderText="Your Nickname" Margin="12" x:Name="txtNickName"></TextBox>
+            <TextBox PlaceholderText="Your Phone Number with International Code , Ex : 62xxxxxxxxxx" Margin="12" x:Name="txtUsername"></TextBox>
+            <PasswordBox x:Name="txtPassword" PlaceholderText="Your Whatsapp Password" Margin="12"/>
+            <Button x:Name="btnLogin" Content="Login" Margin="12" Click="btnLogin_Click"/>
+        </StackPanel>
     </Grid>
 </Page>

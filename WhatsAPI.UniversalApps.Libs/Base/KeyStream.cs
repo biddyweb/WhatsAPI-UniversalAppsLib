@@ -7,6 +7,7 @@ using WhatsAPI.UniversalApps.Libs.Utils.Encryptions;
 
 namespace WhatsAPI.UniversalApps.Libs.Base
 {
+    //TODO: Fix this still error
     public class KeyStream
     {
         public const string AuthMethod = "WAUTH-2";

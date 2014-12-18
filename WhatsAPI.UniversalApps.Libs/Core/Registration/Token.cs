@@ -16,7 +16,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
             List<byte> data = new List<byte>(Convert.FromBase64String(Constants.Token.Signature));
             data.AddRange(Convert.FromBase64String(Constants.Token.ClassMD5));
             
-            var strByte = System.Text.Encoding.GetEncoding("US-ASCII").GetBytes(number);
+            var strByte = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetBytes(number);
             data.AddRange(strByte);
           
             List<byte> opad = GetFilledList(0x5C, 64);

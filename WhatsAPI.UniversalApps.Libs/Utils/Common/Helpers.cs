@@ -71,7 +71,20 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             TimeSpan span = (value - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc));
             return (long)span.TotalSeconds;
         }
-
+        public static DateTime GetDateTimeFromTimestamp(string timestamp)
+        {
+            long data = 0;
+            if (long.TryParse(timestamp, out data))
+            {
+                return GetDateTimeFromTimestamp(data);
+            }
+            return DateTime.Now;
+        }
+        protected static DateTime GetDateTimeFromTimestamp(long timestamp)
+        {
+            DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return UnixEpoch.AddSeconds(timestamp);
+        }
         public static long GetNowUnixTimestamp()
         {
             return GetUnixTimestamp(DateTime.UtcNow);

@@ -17,5 +17,14 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Logger
             System.Diagnostics.Debug.WriteLine(string.Format("Request to Whatsapp Web Service Log : {0}{1}", Environment.NewLine, sb.ToString()));
 #endif
         }
+
+        public static void WriteLog(string message)
+        {
+#if DEBUG
+            var sb = new StringBuilder();
+            sb.AppendLine("["+DateTime.Now.ToLocalTime()+"] => " + message);
+            System.Diagnostics.Debug.WriteLine(string.Format("WhatsApp Service Log : {0}{1}", Environment.NewLine, sb.ToString()));
+#endif
+        }
     }
 }

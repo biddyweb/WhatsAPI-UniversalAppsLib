@@ -73,5 +73,9 @@ namespace WhatsAPI.UniversalApps.Libs.Constants
         /// </summary>
         public static DateTime UnixEpoch = new DateTime(0x7b2, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
         #endregion
+
+        #region TextEncoding
+        public static string ASCIIEncoding = "US-ASCII";
+        #endregion
     }
 }
