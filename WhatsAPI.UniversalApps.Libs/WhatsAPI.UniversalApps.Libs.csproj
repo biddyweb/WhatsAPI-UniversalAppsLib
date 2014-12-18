@@ -49,6 +49,11 @@
     <Compile Include="Constants\Enums.cs" />
     <Compile Include="Constants\Information.cs" />
     <Compile Include="Constants\Token.cs" />
+    <Compile Include="Core\Encryption\HashAlgorithm.cs" />
+    <Compile Include="Core\Encryption\ICryptoTransform.cs" />
+    <Compile Include="Core\Encryption\SHA1\SHA1.cs" />
+    <Compile Include="Core\Encryption\SHA1\SHA1CryptoProvider.cs" />
+    <Compile Include="Core\Encryption\SHA1\SHA1Managed.cs" />
     <Compile Include="Core\Registration\Register.cs" />
     <Compile Include="Core\Registration\Token.cs" />
     <Compile Include="Extensions\CultureInfoExtensions.cs" />

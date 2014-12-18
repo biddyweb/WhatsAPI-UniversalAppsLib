@@ -15,8 +15,10 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
 
             List<byte> data = new List<byte>(Convert.FromBase64String(Constants.Token.Signature));
             data.AddRange(Convert.FromBase64String(Constants.Token.ClassMD5));
-            data.AddRange(System.Text.Encoding.GetEncoding("iso-8859-1").GetBytes(number));
-
+            
+            var strByte = System.Text.Encoding.GetEncoding("US-ASCII").GetBytes(number);
+            data.AddRange(strByte);
+          
             List<byte> opad = GetFilledList(0x5C, 64);
             List<byte> ipad = GetFilledList(0x36, 64);
             for (int i = 0; i < opad.Count; i++)
@@ -24,15 +26,13 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
                 opad[i] = (byte)(opad[i] ^ key[i]);
                 ipad[i] = (byte)(ipad[i] ^ key[i]);
             }
-
-
+            Core.Encryption.SHA1.SHA1 hasher = Core.Encryption.SHA1.SHA1.Create();
 
             ipad.AddRange(data);
-            var ipadString = Encoding.GetEncoding("iso-8859-1").GetString(ipad.ToArray(), 0, ipad.ToArray().Length);
-            data = new List<byte>(SHA1.EncryptBase64(ipad.ToArray()));
+         
+            data = new List<byte>(hasher.ComputeHash(ipad.ToArray()));
             opad.AddRange(data);
-            data = new List<byte>(SHA1.EncryptBase64(opad.ToArray()));
-
+            data = new List<byte>(hasher.ComputeHash(opad.ToArray()));
             return Convert.ToBase64String(data.ToArray());
         }
 
