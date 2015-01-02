@@ -28,11 +28,19 @@ namespace WhatsAPI.UniversalApps.Sample
         public MainPage()
         {
             this.InitializeComponent();
+            this.Loaded += MainPage_Loaded;
+        }
+
+        void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.txtNickName.Text = "BR";
+            this.txtUsername.Text = "xxxxxxxxxxxxx"; //phonenumber without +
+            this.txtPassword.Password = "hYjVoXPu7TO5jo0N5fIu4LcadwM=";
         }
 
         private async void btnRegister_Click(object sender, RoutedEventArgs e)
         {
-            var Register = await WhatsAPI.UniversalApps.Libs.Core.Registration.Register.RequestCode("xxxxxxxxxxxxxxxx");
+            var Register = await WhatsAPI.UniversalApps.Libs.Core.Registration.Register.RequestCode("xxxxxxxxxxx"); //phonenumber without +
             if (!Register.IsSuccess)
             {
 #if !WINDOWS_PHONE_APP

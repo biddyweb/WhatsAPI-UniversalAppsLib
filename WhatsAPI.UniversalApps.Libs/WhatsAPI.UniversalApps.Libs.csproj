@@ -53,11 +53,17 @@
     <Compile Include="Constants\Information.cs" />
     <Compile Include="Constants\Token.cs" />
     <Compile Include="Core\Connection\Sockets.cs" />
+    <Compile Include="Core\Encryption\CryptoTools.cs" />
     <Compile Include="Core\Encryption\HashAlgorithm.cs" />
+    <Compile Include="Core\Encryption\HMACSHA1\HMac.cs" />
+    <Compile Include="Core\Encryption\HMACSHA1\HMACSHA1.cs" />
     <Compile Include="Core\Encryption\ICryptoTransform.cs" />
     <Compile Include="Core\Encryption\KeyedHashAlgorithm.cs" />
     <Compile Include="Core\Encryption\KeyNumber.cs" />
     <Compile Include="Core\Encryption\KeySizes.cs" />
+    <Compile Include="Core\Encryption\RandomNumberGenerator.cs" />
+    <Compile Include="Core\Encryption\Rfc2898DeriveBytes\DeriveBytes.cs" />
+    <Compile Include="Core\Encryption\Rfc2898DeriveBytes\Rfc2898DeriveBytes.cs" />
     <Compile Include="Core\Encryption\SHA1\SHA1.cs" />
     <Compile Include="Core\Encryption\SHA1\SHA1CryptoProvider.cs" />
     <Compile Include="Core\Encryption\SHA1\SHA1Managed.cs" />

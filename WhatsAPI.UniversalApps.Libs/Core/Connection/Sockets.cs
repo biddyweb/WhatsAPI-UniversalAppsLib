@@ -163,24 +163,24 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
             var buff = new byte[length];
             int receiveLength = 0;
 
-            try
-            {
+            //try
+            //{
                 var byteReceived = await StartReceiving((uint)length);
                 receiveLength = byteReceived.Length;
                 //receiveLength = socket.Receive(buff, 0, length, 0);
-            }
-            catch (Exception excpt)
-            {
-                if (SocketError.GetStatus(excpt.HResult) == SocketErrorStatus.ConnectionTimedOut)
-                {
-                    System.Diagnostics.Debug.WriteLine("Connect-TimeOut");
-                    return null;
-                }
-                else
-                {
-                    throw new ConnectionException("Unknown error occured", excpt);
-                }
-            }
+            //}
+            //catch (Exception excpt)
+            //{
+            //    if (SocketError.GetStatus(excpt.HResult) == SocketErrorStatus.ConnectionTimedOut)
+            //    {
+            //        System.Diagnostics.Debug.WriteLine("Connect-TimeOut");
+            //        return null;
+            //    }
+            //    else
+            //    {
+            //        throw new ConnectionException("Unknown error occured", excpt);
+            //    }
+            //}
 
             while (receiveLength <= 0) ;
 
@@ -261,7 +261,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
 
                                        try
                                        {
-                                           uint bytesRead = await _readerPacket.LoadAsync(length);
+                                           uint bytesRead = await _readerPacket.LoadAsync(1024);
                                            return HandleReceive(bytesRead, _readerPacket,(int)length);
                                        }
                                        catch (Exception ex)
@@ -285,6 +285,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
             if (bytesRead > 0)
                 System.Buffer.BlockCopy(convBuffer, 0, tmpRet, (int)_transferredSize, convBuffer.Length);
             _transferredSize += bytesRead;
+            WhatsAPI.UniversalApps.Libs.Utils.Logger.Log.WriteLog("Receive Message => " + System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetString(tmpRet, 0, tmpRet.Length));
             return tmpRet;
         }
 
@@ -347,6 +348,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                 {
                     await Connect();
                 }
+                WhatsAPI.UniversalApps.Libs.Utils.Logger.Log.WriteLog("Sending Data =>" + System.Text.Encoding.UTF8.GetString(sendBytes, 0, sendBytes.Length));
                 _writePacket.WriteBytes(sendBytes);
                 await _writePacket.StoreAsync();
             }

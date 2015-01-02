@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WhatsAPI.UniversalApps.Libs.Core.Encryption.HMACSHA1;
+using WhatsAPI.UniversalApps.Libs.Core.Encryption.Rfc2898DeriveBytes;
 using WhatsAPI.UniversalApps.Libs.Utils.Encryptions;
 
 namespace WhatsAPI.UniversalApps.Libs.Base
@@ -13,13 +15,13 @@ namespace WhatsAPI.UniversalApps.Libs.Base
         public const string AuthMethod = "WAUTH-2";
         private const int Drop = 768;
         private RC4 rc4;
-        private SHA1 mac;
+        private HMACSHA1 mac;
         private uint seq;
 
         public KeyStream(byte[] key, byte[] macKey)
         {
             this.rc4 = new RC4(key, 768);
-            this.mac = new SHA1(macKey);
+            this.mac = new HMACSHA1(macKey);
         }
 
         public static byte[][] GenerateKeys(byte[] password, byte[] nonce)
@@ -42,15 +44,15 @@ namespace WhatsAPI.UniversalApps.Libs.Base
             for (int j = 0; j < array2.Length; j++)
             {
                 nonce[nonce.Length - 1] = array3[j];
-                //Rfc2898DeriveBytes rfc2898DeriveBytes = new Rfc2898DeriveBytes(password, nonce, 2);
-                //array2[j] = rfc2898DeriveBytes.GetBytes(20);
+                Rfc2898DeriveBytes rfc2898DeriveBytes = new Rfc2898DeriveBytes(password, nonce, 2);
+                array2[j] = rfc2898DeriveBytes.GetBytes(20);
             }
             return array2;
         }
 
         public void DecodeMessage(byte[] buffer, int macOffset, int offset, int length)
         {
-            byte[] array = SHA1.Encrypt(buffer);//this.ComputeMac(buffer, offset, length);
+            byte[] array = this.ComputeMac(buffer, offset, length);
             for (int i = 0; i < 4; i++)
             {
                 if (buffer[macOffset + i] != array[i])
@@ -64,24 +66,24 @@ namespace WhatsAPI.UniversalApps.Libs.Base
         public void EncodeMessage(byte[] buffer, int macOffset, int offset, int length)
         {
             this.rc4.Cipher(buffer, offset, length);
-            byte[] array = SHA1.Encrypt(buffer);//, offset, length);
+            byte[] array = this.ComputeMac(buffer, offset, length);
             Array.Copy(array, 0, buffer, macOffset, 4);
         }
 
-        //private byte[] ComputeMac(byte[] buffer, int offset, int length)
-        //{
-            //this.mac.Initialize();
-            //this.mac.TransformBlock(buffer, offset, length, buffer, offset);
-            //byte[] array = new byte[]
-            //{
-            //    (byte)(this.seq >> 24),
-            //    (byte)(this.seq >> 16),
-            //    (byte)(this.seq >> 8),
-            //    (byte)this.seq
-            //};
-            //this.mac.TransformFinalBlock(array, 0, array.Length);
-            //this.seq += 1u;
-            //return this.mac.Hash;
-        //}
+        private byte[] ComputeMac(byte[] buffer, int offset, int length)
+        {
+            this.mac.Initialize();
+            this.mac.TransformBlock(buffer, offset, length, buffer, offset);
+            byte[] array = new byte[]
+            {
+                (byte)(this.seq >> 24),
+                (byte)(this.seq >> 16),
+                (byte)(this.seq >> 8),
+                (byte)this.seq
+            };
+            this.mac.TransformFinalBlock(array, 0, array.Length);
+            this.seq += 1u;
+            return this.mac.Hash;
+        }
     }
 }

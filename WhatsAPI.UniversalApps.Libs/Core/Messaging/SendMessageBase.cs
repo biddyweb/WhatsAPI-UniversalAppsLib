@@ -35,20 +35,23 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                                   var data = this.BinWriter.StartStream(Constants.Information.WhatsAppServer, resource);
                                   var feat = this.addFeatures();
                                   var auth = this.addAuth();
+                                  var stringData = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetString(data, 0, data.Length);
+                                  var stringFeat = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetString(feat.data, 0, feat.data.Length);
+                                  var stringAuth = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetString(auth.data, 0, auth.data.Length);
                                   await this.SendData(data);
                                   await this.SendData(this.BinWriter.Write(feat, false));
                                   await this.SendData(this.BinWriter.Write(auth, false));
 
-                                   await this.pollMessage();//stream start
-                                   await this.pollMessage();//features
-                                   await this.pollMessage();//challenge or success
+                                  await this.PollMessagess();//stream start
+                                  await this.PollMessagess();//features
+                                  await this.PollMessagess();//challenge or success
 
                                   if (this.loginStatus != WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.LOGGEDIN)
                                   {
                                       //oneshot failed
                                       ProtocolTreeNode authResp = this.addAuthResponse();
-                                      this.SendData(this.BinWriter.Write(authResp, false));
-                                      this.pollMessage();
+                                      await this.SendData(this.BinWriter.Write(authResp, false));
+                                      await this.pollMessage();
                                   }
 
                                   this.SendAvailableForChat(this.name, this.hidden);
@@ -62,7 +65,21 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                                   while (await pollMessage(autoReceipt)) ;
                               });
         }
-
+        public async Task PollMessagess()
+        {
+            await Task.Run(async () =>
+            {
+                try
+                {
+                    byte[] data = await this.whatsNetwork.ReadData();
+                    this.processInboundData(data);
+                }
+                catch (Exception ex)
+                {
+                    WhatsAPI.UniversalApps.Libs.Utils.Logger.Log.WriteLog("Connection ERror " + ex.Message);
+                }
+            });
+        }
         public async Task <bool> pollMessage(bool autoReceipt = true)
         {
             if (this.loginStatus == WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.CONNECTED || this.loginStatus == WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.LOGGEDIN)
