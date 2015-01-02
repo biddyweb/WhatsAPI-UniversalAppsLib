@@ -68,6 +68,7 @@
     <Compile Include="Core\Encryption\SHA1\SHA1CryptoProvider.cs" />
     <Compile Include="Core\Encryption\SHA1\SHA1Managed.cs" />
     <Compile Include="Core\Events\EventBase.cs" />
+    <Compile Include="Core\Events\EventsHandler.cs" />
     <Compile Include="Core\Exceptions\ConnectionException.cs" />
     <Compile Include="Core\Messaging\MessagingBase.cs" />
     <Compile Include="Core\Messaging\SendMessageBase.cs" />
