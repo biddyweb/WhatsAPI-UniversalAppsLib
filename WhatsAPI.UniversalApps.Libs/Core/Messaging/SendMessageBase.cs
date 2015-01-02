@@ -42,9 +42,9 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                                   await this.SendData(this.BinWriter.Write(feat, false));
                                   await this.SendData(this.BinWriter.Write(auth, false));
 
-                                  await this.PollMessagess();//stream start
-                                  await this.PollMessagess();//features
-                                  await this.PollMessagess();//challenge or success
+                                   await this.pollMessage();//stream start
+                                   await this.pollMessage();//features
+                                   await this.pollMessage();//challenge or success
 
                                   if (this.loginStatus != WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.LOGGEDIN)
                                   {

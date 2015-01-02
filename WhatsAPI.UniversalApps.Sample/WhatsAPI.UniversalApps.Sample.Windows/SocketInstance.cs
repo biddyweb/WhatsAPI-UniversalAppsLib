@@ -28,7 +28,7 @@ namespace WhatsAPI.UniversalApps.Sample
 
         public static void Create(string username, string password, string nickname, bool debug = false)
         {
-            _instance = new WhatsApp(username, password, nickname, debug,false);
+            _instance = new WhatsApp(username, password, nickname, true,false);
         }
     }
 }

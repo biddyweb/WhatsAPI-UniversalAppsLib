@@ -253,10 +253,10 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
 
         protected void DebugPrint(string debugMsg)
         {
-            if (WhatsApp.DEBUG && debugMsg.Length > 0)
-            {
+            //if (WhatsApp.DEBUG && debugMsg.Length > 0)
+            //{
                 Logger.Log.WriteLog(debugMsg);
-            }
+            //}
         }
     }
 }

@@ -28,7 +28,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Encryption.HMACSHA1
 
         private bool _disposed;
         private string _hashName;
-        private HashAlgorithm _algo;
+        private SHA1.SHA1 _algo;
         private WhatsAPI.UniversalApps.Libs.Core.Encryption.CryptoTools.BlockProcessor _block;
         private int _blockSizeValue;
 
@@ -54,7 +54,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Encryption.HMACSHA1
             set
             {
                 _hashName = value;
-                _algo = HashAlgorithm.Create(_hashName);
+                _algo =  SHA1.SHA1.Create();
             }
         }
 

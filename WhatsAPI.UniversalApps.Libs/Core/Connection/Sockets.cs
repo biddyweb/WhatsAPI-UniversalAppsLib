@@ -85,12 +85,13 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
 
 
                     this.socket = new StreamSocket();
-                  
+                    this.socket.Control.KeepAlive = true;
                     _writePacket = new DataWriter(this.socket.OutputStream);
                     _readerPacket = new DataReader(this.socket.InputStream);
                     _readerPacket.InputStreamOptions = InputStreamOptions.Partial;
                     var endPoint = new HostName(this.whatsHost);
                     await this.socket.ConnectAsync(endPoint, this.whatsPort.ToString());
+                    
                     //socket.UpgradeToSslAsync(SocketProtectionLevel.SslAllowNullEncryption, new HostName(this.whatsHost));
                     //HandleConnect();
                     _transferredSize = 0;
@@ -192,7 +193,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
 
         public async Task<byte[]> ReadData(int length = 1024)
         {
-            return await Socket_read(length);
+            return await StartReceiving((uint)length);
         }
         /// <summary>
         /// Sends data of a specific length to the server
@@ -261,7 +262,9 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
 
                                        try
                                        {
-                                           uint bytesRead = await _readerPacket.LoadAsync(1024);
+                                           uint bytesRead = await _readerPacket.LoadAsync(length);
+                                           if (bytesRead == 0)
+                                               return null;
                                            return HandleReceive(bytesRead, _readerPacket,(int)length);
                                        }
                                        catch (Exception ex)
@@ -283,9 +286,10 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
             var ibuffer = readPacket.ReadBuffer(readPacket.UnconsumedBufferLength);
             Byte[] convBuffer = WindowsRuntimeBufferExtensions.ToArray(ibuffer);
             if (bytesRead > 0)
-                System.Buffer.BlockCopy(convBuffer, 0, tmpRet, (int)_transferredSize, convBuffer.Length);
+                System.Buffer.BlockCopy(convBuffer, 0, tmpRet, (int)0, length);
             _transferredSize += bytesRead;
-            WhatsAPI.UniversalApps.Libs.Utils.Logger.Log.WriteLog("Receive Message => " + System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetString(tmpRet, 0, tmpRet.Length));
+            var kucing = System.Text.Encoding.UTF8.GetString(tmpRet, 0, tmpRet.Length);
+            WhatsAPI.UniversalApps.Libs.Utils.Logger.Log.WriteLog("Receive Message => " + System.Text.Encoding.UTF8.GetString(tmpRet, 0, tmpRet.Length));
             return tmpRet;
         }
 
