@@ -124,5 +124,13 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             return target;
         }
 #endregion
+
+        #region GetCurrentVersion
+        public static async Task<string> GetCurrentWhatsAppVersion()
+        {
+            var response = await HttpRequest.Get(Constants.Information.WhatsVersionCheckerHost);
+            return response.ToString().Trim();
+        }
+        #endregion
     }
 }

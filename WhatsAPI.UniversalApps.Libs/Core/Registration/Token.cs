@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsAPI.UniversalApps.Libs.Utils.Encryptions;
+using WhatsAPI.UniversalApps.Libs.Extensions;
 
 namespace WhatsAPI.UniversalApps.Libs.Core.Registration
 {
@@ -44,6 +45,23 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
                 result.Add(item);
             }
             return result;
+        }
+
+        public static async Task<string> GenerateTokenS40Online(string phone)
+        {
+            string response = await Utils.Common.HttpRequest.Get(Constants.Information.WhatsVersionScratchHost);
+            string buildToken = "";
+            if (response.GetJsonValue("g").Length > 0)
+            {
+                buildToken = response.GetJsonValue("g");
+            }
+            return MD5.Encrypt(buildToken + response.GetJsonValue("h").ToString() + phone);
+               
+        }
+
+        public static string GenerateTokenS40Offline(string phone)
+        {
+            return MD5.Encrypt("PdA2DJyKoUrwLw1Bg6EIhzh502dF9noR9uFCllGk1419900749520" + phone);
         }
     }
 }

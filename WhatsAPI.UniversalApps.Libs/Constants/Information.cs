@@ -83,6 +83,8 @@ namespace WhatsAPI.UniversalApps.Libs.Constants
         /// Check Current Whatsapp Version
         /// </summary>
         public const string WhatsVersionCheckerHost = "https://coderus.openrepos.net/whitesoft/whatsapp_version";
+
+        public const string WhatsVersionScratchHost = "https://coderus.openrepos.net/whitesoft/whatsapp_scratch";
         #endregion
 
         #region ParserConstants
