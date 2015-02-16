@@ -52,5 +52,17 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
 
             return sb.ToString();
         }
+
+        public static void ExtractPhoneNumber(ref string phone)
+        {
+            if (phone.Contains("s.whatsapp"))
+            {
+                phone = phone.Replace("@s.whatsapp.net", "");
+            }
+            else
+            {
+                phone = phone.Replace("@g.us", "");
+            }
+        }
     }
 }

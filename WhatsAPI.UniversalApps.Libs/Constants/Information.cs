@@ -39,11 +39,30 @@ namespace WhatsAPI.UniversalApps.Libs.Constants
         /// </summary>
         public const string WhatsGroupChat = "g.us";
 
+        /// <summary>
+        /// Check Credential Server
+        /// </summary>
+        public const string WhatsCheckHost = "v.whatsapp.net/v2/exist";
+
+        /// <summary>
+        /// Registration Host
+        /// </summary>
+        public const string WhatsRegisterHost = "v.whatsapp.net/v2/register";
+
+        /// <summary>
+        /// Whatsapp Request Code Host
+        /// </summary>
+        public const string WhatsRequestCodeHost = "v.whatsapp.net/v2/code";
+
+        /// <summary>
+        /// Upload Media Host
+        /// </summary>
+        public const string WhatsUploadHost = "https://mms.whatsapp.net/client/iphone/upload.php";
 
         /// <summary>
         /// The whatsapp version the client complies to
         /// </summary>
-        public const string WhatsAppVer = "2.11.426";
+        public const string WhatsAppVer = "2.11.14";
 
         /// <summary>
         /// The port that needs to be connected to
@@ -53,13 +72,17 @@ namespace WhatsAPI.UniversalApps.Libs.Constants
         /// <summary>
         /// iPhone device
         /// </summary>
-        public const string Device = "Android";
+        public const string Device = "iPhone";
 
         /// <summary>
         /// The useragent used for http requests
         /// </summary>
-        public const string UserAgent = "WhatsApp/2.11.426 Android/4.0.4 Device/GalaxyS3";
+        public const string UserAgent = "WhatsApp/2.12.61 S40Version/14.26 Device/Nokia302";
 
+        /// <summary>
+        /// Check Current Whatsapp Version
+        /// </summary>
+        public const string WhatsVersionCheckerHost = "https://coderus.openrepos.net/whitesoft/whatsapp_version";
         #endregion
 
         #region ParserConstants
