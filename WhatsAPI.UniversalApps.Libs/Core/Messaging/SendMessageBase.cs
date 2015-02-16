@@ -27,10 +27,15 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                                   {
                                       this._challengeBytes = nextChallenge;
                                   }
-
+                                  string whatsAppVersion = Constants.Information.WhatsAppVer.ToString();
+                                  var currentVersionChecking = await Helpers.GetCurrentWhatsAppVersion();
+                                  if (Constants.Information.WhatsAppVer.ToString() != currentVersionChecking)
+                                  {
+                                      whatsAppVersion = currentVersionChecking;
+                                  }
                                   string resource = string.Format(@"{0}-{1}-{2}",
                                       Constants.Information.Device,
-                                      Constants.Information.WhatsAppVer,
+                                      whatsAppVersion,
                                       Constants.Information.WhatsPort);
                                   var data = this.BinWriter.StartStream(Constants.Information.WhatsAppServer, resource);
                                   var feat = this.addFeatures();
@@ -42,9 +47,9 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                                   await this.SendData(this.BinWriter.Write(feat, false));
                                   await this.SendData(this.BinWriter.Write(auth, false));
 
-                                   await this.pollMessage();//stream start
-                                   await this.pollMessage();//features
-                                   await this.pollMessage();//challenge or success
+                                  await this.pollMessage();//stream start
+                                  await this.pollMessage();//features
+                                  await this.pollMessage();//challenge or success
 
                                   if (this.loginStatus != WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.LOGGEDIN)
                                   {
@@ -55,7 +60,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                                   }
 
                                   this.SendAvailableForChat(this.name, this.hidden);
-            });
+                              });
         }
 
         public async Task PollMessages(bool autoReceipt = true)
@@ -80,7 +85,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                 }
             });
         }
-        public async Task <bool> pollMessage(bool autoReceipt = true)
+        public async Task<bool> pollMessage(bool autoReceipt = true)
         {
             if (this.loginStatus == WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.CONNECTED || this.loginStatus == WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.LOGGEDIN)
             {

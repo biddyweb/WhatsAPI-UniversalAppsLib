@@ -24,6 +24,11 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
             return Token.GenerateToken(number);
         }
 
+        public static async Task<string> GetTokenAsync(string number)
+        {
+            return await Token.GenerateTokenS40Online(number);
+        }
+
         public static async Task<RegisterResponse> RequestCode(string phoneNumber, string method = "sms", string id = null)
         {
             if (phoneNumber.Contains("+"))
@@ -42,7 +47,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
                     id = GenerateIdentity(phoneNumber);
                 }
                 PhoneNumber pn = new PhoneNumber(phoneNumber);
-                string token = System.Uri.EscapeDataString(GetToken(pn.Number));
+                string token = System.Uri.EscapeDataString(await GetTokenAsync(pn.Number));
                 request = string.Format("https://"+Constants.Information.WhatsRequestCodeHost+"?cc={0}&in={1}&to={0}{1}&method={2}&sim_mcc={3}&sim_mnc={4}&token={5}&id={6}&lg={7}&lc={8}", pn.CC, pn.Number, method, pn.MCC, pn.MNC, token, id, pn.ISO639, pn.ISO3166);
                 response = await HttpRequest.Get(request);
                 password = response.GetJsonValue("pw");
@@ -55,7 +60,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
                 }
                 result.IsSuccess = response.GetJsonValue("status") == "sent";
                 result.Password = "";
-                result.Response = "";
+                result.Response = response.GetJsonValue("reason").Length > 0 ? response.GetJsonValue("reason") : "";
                 return (result);
             }
             catch (Exception e)
