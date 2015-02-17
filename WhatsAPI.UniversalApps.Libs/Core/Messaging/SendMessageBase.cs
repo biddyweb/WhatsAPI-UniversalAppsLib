@@ -325,6 +325,11 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
             return false;
         }
 
+        /// <summary>
+        /// Implementing Encrypted Message using Code from https://github.com/mgp25/WhatsAPINet/commit/c5cc72222a3da32ec36b6e59a275df7ee306d074
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="autoReceipt"></param>
         protected void handleMessage(ProtocolTreeNode node, bool autoReceipt)
         {
             if (!string.IsNullOrEmpty(node.GetAttribute("notify")))
@@ -336,10 +341,14 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
             {
                 throw new NotImplementedException(node.NodeString());
             }
-            if (node.GetChild("body") != null)
+            if (node.GetChild("body") != null || node.GetChild("enc") != null)
             {
                 //text message
-                this.fireOnGetMessage(node, node.GetAttribute("from"), node.GetAttribute("id"), node.GetAttribute("notify"), System.Text.Encoding.UTF8.GetString(node.GetChild("body").GetData(), 0, node.GetChild("body").GetData().Length), autoReceipt);
+                var contentNode = node.GetChild("body") ?? node.GetChild("enc");
+                {
+                    this.fireOnGetMessage(node, node.GetAttribute("from"), node.GetAttribute("id"), node.GetAttribute("notify"), System.Text.Encoding.UTF8.GetString(node.GetChild("body").GetData(), 0, node.GetChild("body").GetData().Length), autoReceipt);
+
+                }
                 if (autoReceipt)
                 {
                     this.sendMessageReceived(node);
