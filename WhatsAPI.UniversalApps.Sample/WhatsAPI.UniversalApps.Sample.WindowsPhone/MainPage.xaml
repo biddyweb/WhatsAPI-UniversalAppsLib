@@ -6,9 +6,30 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    xmlns:toolkit="using:WinRTXamlToolkit.Controls"
+    Background="White">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="250"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center"  VerticalAlignment="Bottom">
+            <Image Source="Assets/app-logo.png" Height="128" Width="128"/>
+        </StackPanel>
+
+        <Border BorderThickness="0" Grid.Row="1" Margin="24 24" CornerRadius="5" BorderBrush="{StaticResource OrangeColor}">
+        <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <toolkit:WatermarkTextBox InputScope="TelephoneNumber" Margin="12"  WatermarkText="Your Phone Number" Text="{Binding PhoneNumber,Mode=TwoWay}" Grid.Row="1" BorderBrush="{StaticResource OrangeColor}" WatermarkTextStyle="{StaticResource WatermarkStyle}"/>
+                <Button HorizontalAlignment="Center" Command="{Binding OnLoginCommand}" Content="Request Code" Foreground="{StaticResource OrangeColor}" Grid.Row="2" BorderBrush="{StaticResource OrangeColor}" VerticalAlignment="Top"/>
+            </Grid>
+        </Border>
 
     </Grid>
 </Page>

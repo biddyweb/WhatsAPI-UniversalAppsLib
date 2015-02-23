@@ -102,5 +102,11 @@ namespace WhatsAPI.UniversalApps.Libs.Constants
         #region TextEncoding
         public static string ASCIIEncoding = "US-ASCII";
         #endregion
+
+
+        #region FILE I/O
+        public const string WhatsNextChallengeFile = ""; 
+
+        #endregion
     }
 }

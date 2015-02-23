@@ -21,7 +21,7 @@ namespace WhatsAPI.UniversalApps.Sample
                 }
                 else
                 {
-                    return null;
+                    throw new Exception("Instance is not set");
                 }
             }
         }

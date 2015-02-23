@@ -15,6 +15,20 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+#if !WINDOWS_APP
+using Microsoft.Practices.Prism.StoreApps.Interfaces;
+using Microsoft.Practices.Prism.Mvvm;
+using Microsoft.Practices.Prism.PubSubEvents;
+using Microsoft.Practices.Prism.StoreApps;
+using Microsoft.Practices.Prism.StoreApps.Interfaces;
+using Windows.UI.Notifications;
+using Microsoft.Practices.Prism.Mvvm.Interfaces;
+#else
+using WhatsAPI.UniversalApps.Sample.Views;
+using WhatsAPI.UniversalApps.Sample.Repositories;
+using WhatsAPI.UniversalApps.Sample.Models;
+using WhatsAPI.UniversalApps.Sample.Constants;
+#endif
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -25,9 +39,21 @@ namespace WhatsAPI.UniversalApps.Sample
     /// </summary>
     public sealed partial class App : Application
     {
+
+        //Bootstrap: App singleton service declarations
+
 #if WINDOWS_PHONE_APP
+         private TileUpdater _tileUpdater;
+
+        public IEventAggregator EventAggregator { get; set; }
+
+        // Create the singleton container that will be used for type resolution in the app
+ 
         private TransitionCollection transitions;
 #endif
+        public static string UserName { get; set; }
+        public static string PhoneNumber { get; set; }
+        public static string Password { get; set; }
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -38,19 +64,27 @@ namespace WhatsAPI.UniversalApps.Sample
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
         }
-
+#if WINDOWS_PHONE_APP 
+        private void OnInitialize()
+        {
+            EventAggregator = new EventAggregator();
+            //_container.RegisterInstance<INavigationService>(NavigationService);
+            //_container.RegisterInstance<IEventAggregator>(EventAggregator);
+            
+        }
+#endif
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used when the application is launched to open a specific file, to display
         /// search results, and so forth.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
-                this.DebugSettings.EnableFrameRateCounter = true;
+                this.DebugSettings.EnableFrameRateCounter = false;
             }
 #endif
 
@@ -73,6 +107,8 @@ namespace WhatsAPI.UniversalApps.Sample
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
+
+
             }
 
             if (rootFrame.Content == null)
@@ -95,10 +131,41 @@ namespace WhatsAPI.UniversalApps.Sample
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
+#if WINDOWS_APP
+                await DBProvider.InitializeDB();
+                if (await DBProvider.CheckDB() && DBProvider.DBConnection.Table<Config>().Where(x => x.key == ConfigKey.Username).Count() == 0)
+                {
+
+                    if (!rootFrame.Navigate(typeof(ProvisioningWindow), e.Arguments))
+                    {
+                        throw new Exception("Failed to create initial page");
+                    }
+                }
+                else
+                {
+                    if (await DBProvider.CheckDB() && DBProvider.DBConnection.Table<Config>().Where(x => x.key == ConfigKey.Password).Count() > 0)
+                    {
+                        if (!rootFrame.Navigate(typeof(ChattingPage), e.Arguments))
+                        {
+                            throw new Exception("Failed to create initial page");
+                        }
+                    }
+                    else
+                    {
+                        if (!rootFrame.Navigate(typeof(InputNameWindow), e.Arguments))
+                        {
+                            throw new Exception("Failed to create initial page");
+                        }
+                    }
+                }
+
+#else
                 if (!rootFrame.Navigate(typeof(MainPage), e.Arguments))
                 {
                     throw new Exception("Failed to create initial page");
                 }
+                    OnInitialize();
+#endif
             }
 
             // Ensure the current window is active
@@ -133,5 +200,6 @@ namespace WhatsAPI.UniversalApps.Sample
             // TODO: Save application state and stop any background activity
             deferral.Complete();
         }
+
     }
 }

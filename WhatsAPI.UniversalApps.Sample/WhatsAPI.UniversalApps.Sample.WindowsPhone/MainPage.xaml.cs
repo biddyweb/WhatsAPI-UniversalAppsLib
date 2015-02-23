@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using WhatsAPI.UniversalApps.Sample.ViewModels;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -29,6 +30,13 @@ namespace WhatsAPI.UniversalApps.Sample
             this.NavigationCacheMode = NavigationCacheMode.Required;
         }
 
+        public MainPageViewModel ViewModel
+        {
+            get
+            {
+                return (this.DataContext as MainPageViewModel);
+            }
+        }
         /// <summary>
         /// Invoked when this page is about to be displayed in a Frame.
         /// </summary>
@@ -43,6 +51,7 @@ namespace WhatsAPI.UniversalApps.Sample
             // Windows.Phone.UI.Input.HardwareButtons.BackPressed event.
             // If you are using the NavigationHelper provided by some templates,
             // this event is handled for you.
+            this.DataContext = new MainPageViewModel();
         }
     }
 }

@@ -122,7 +122,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
             {
                 attr.Add(new KeyValue("passive", "true"));
             }
-            var node = new ProtocolTreeNode("auth", attr.ToArray(), null, this.getAuthBlob());
+            var node = new ProtocolTreeNode("auth", attr.ToArray(), null,this.getAuthBlob());
             return node;
         }
 
@@ -137,21 +137,26 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
 
                 this.outputKey = new KeyStream(keys[0], keys[1]);
 
-                PhoneNumber pn = new PhoneNumber(this.phoneNumber, true);
-                List<byte> b = new List<byte>();
-                b.AddRange(new byte[] { 0, 0, 0, 0 });
-                b.AddRange(WhatsApp.SYSEncoding.GetBytes(this.phoneNumber));
-                b.AddRange(this._challengeBytes);
-                b.AddRange(WhatsApp.SYSEncoding.GetBytes(Helpers.GetNowUnixTimestamp().ToString()));
-                b.AddRange(WhatsApp.SYSEncoding.GetBytes(Constants.Information.UserAgent));
-                b.AddRange(WhatsApp.SYSEncoding.GetBytes(String.Format(" MccMnc/{0}001", pn.MCC)));
-                data = b.ToArray();
+                PhoneNumber pn = new PhoneNumber(this.phoneNumber);
+                new Action(async () =>
+                {
+                    await pn.ProcessPhoneNumber();
 
-                this._challengeBytes = null;
+                    List<byte> b = new List<byte>();
+                    b.AddRange(new byte[] { 0, 0, 0, 0 });
+                    b.AddRange(WhatsApp.SYSEncoding.GetBytes(this.phoneNumber));
+                    b.AddRange(this._challengeBytes);
+                    b.AddRange(WhatsApp.SYSEncoding.GetBytes(Helpers.GetNowUnixTimestamp().ToString()));
+                    b.AddRange(WhatsApp.SYSEncoding.GetBytes(Constants.Information.UserAgent));
+                    b.AddRange(WhatsApp.SYSEncoding.GetBytes(String.Format(" MccMnc/{0}001", pn.MCC)));
+                    data = b.ToArray();
 
-                this.outputKey.EncodeMessage(data, 0, 4, data.Length - 4);
+                    this._challengeBytes = null;
 
-                this.BinWriter.Key = this.outputKey;
+                    this.outputKey.EncodeMessage(data, 0, 4, data.Length - 4);
+
+                    this.BinWriter.Key = this.outputKey;
+                }).Invoke();
             }
 
             return data;

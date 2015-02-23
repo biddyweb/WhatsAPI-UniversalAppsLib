@@ -12,6 +12,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Button x:Name="btnRegister" Content="Register" HorizontalAlignment="Center" Click="btnRegister_Click"/>
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
@@ -23,6 +24,11 @@
             <TextBox PlaceholderText="Your Phone Number with International Code , Ex : 62xxxxxxxxxx" Margin="12" x:Name="txtUsername"></TextBox>
             <PasswordBox x:Name="txtPassword" PlaceholderText="Your Whatsapp Password" Margin="12"/>
             <Button x:Name="btnLogin" Content="Login" Margin="12" Click="btnLogin_Click"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Center">
+            <TextBox PlaceholderText="Your Chat Destination ( 628xxxx ) " Margin="12" x:Name="txtDestination"></TextBox>
+            <TextBox PlaceholderText="Your Message" Margin="12" x:Name="txtMessage"></TextBox>
+            <Button x:Name="btnSend" Content="Send" Margin="12" Click="btnSend_Click" IsEnabled="False"/>
         </StackPanel>
     </Grid>
 </Page>
