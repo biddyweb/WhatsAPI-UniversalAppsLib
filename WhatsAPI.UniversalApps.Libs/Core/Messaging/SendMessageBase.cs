@@ -50,13 +50,15 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                                   await this.pollMessage();//stream start
                                   await this.pollMessage();//features
                                   await this.pollMessage();//challenge or success
-
+                                  int trying = 0;
                                   if (this.loginStatus != WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.LOGGEDIN)
                                   {
                                       //oneshot failed
                                       ProtocolTreeNode authResp = this.addAuthResponse();
                                       await this.SendData(this.BinWriter.Write(authResp, false));
                                       await this.pollMessage();
+                                      //trying++;
+                                      //await Task.Delay(10);
                                   }
 
                                   this.SendAvailableForChat(this.name, this.hidden);
@@ -135,8 +137,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
 
                 this.outputKey = new KeyStream(keys[0], keys[1]);
 
-                PhoneNumber pn = new PhoneNumber(this.phoneNumber);
-
+                PhoneNumber pn = new PhoneNumber(this.phoneNumber, true);
                 List<byte> b = new List<byte>();
                 b.AddRange(new byte[] { 0, 0, 0, 0 });
                 b.AddRange(WhatsApp.SYSEncoding.GetBytes(this.phoneNumber));

@@ -121,8 +121,10 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             }
             else if (token == 250)
             {
-                string user = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetString(this.readBytes(this.readInt8()), 0, this.readBytes(this.readInt8()).Length);
-                string server = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetString(this.readBytes(this.readInt8()), 0, this.readBytes(this.readInt8()).Length);
+                var bytesUser = this.readBytes(this.readInt8());
+                string user = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetString(bytesUser, 0, bytesUser.Length);
+                var bytesServer =  this.readBytes(this.readInt8());
+                string server = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetString(bytesServer, 0, bytesServer.Length);
                 if ((user.Length > 0) && (server.Length > 0))
                 {
                     ret = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetBytes(user + "@" + server);

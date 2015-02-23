@@ -55,7 +55,8 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
             {
                 buildToken = response.GetJsonValue("g");
             }
-            return MD5.Encrypt(buildToken + response.GetJsonValue("h").ToString() + phone);
+            var plainToken = buildToken + response.GetJsonValue("c").ToString() + phone;
+            return MD5.Encrypt(plainToken);
                
         }
 

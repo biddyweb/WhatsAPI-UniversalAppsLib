@@ -318,7 +318,8 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                 throw new Exception("Failed to read node header");
             }
             int nodeLength = 0;
-            nodeLength = (int)nodeHeader[1] << 8;
+            nodeLength  = (int)((nodeHeader[0] & 0x0F) << 16);
+            nodeLength |= (int)nodeHeader[1] << 8;
             nodeLength |= (int)nodeHeader[2] << 0;
 
             //buffered read

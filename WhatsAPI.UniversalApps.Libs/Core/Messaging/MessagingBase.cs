@@ -131,6 +131,10 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
         {
             try
             {
+                if (this.loginStatus != Constants.Enums.CONNECTION_STATUS.CONNECTED && this.loginStatus != Constants.Enums.CONNECTION_STATUS.LOGGEDIN)
+                {
+                    await this.Connect();
+                }
                 await this.whatsNetwork.SendData(data);
             }
             catch (ConnectionException)

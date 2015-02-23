@@ -62,7 +62,7 @@ namespace WhatsAPI.UniversalApps.Libs.Constants
         /// <summary>
         /// The whatsapp version the client complies to
         /// </summary>
-        public const string WhatsAppVer = "2.11.14";
+        public const string WhatsAppVer = "2.11.527";
 
         /// <summary>
         /// The port that needs to be connected to
@@ -72,7 +72,7 @@ namespace WhatsAPI.UniversalApps.Libs.Constants
         /// <summary>
         /// iPhone device
         /// </summary>
-        public const string Device = "iPhone";
+        public const string Device = "Nokia302";
 
         /// <summary>
         /// The useragent used for http requests

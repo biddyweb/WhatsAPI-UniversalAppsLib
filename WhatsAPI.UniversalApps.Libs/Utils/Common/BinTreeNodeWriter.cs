@@ -35,7 +35,7 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             this.buffer.Add((byte)'A');
             this.buffer.Add(0x1);
             //updating version to versi 5
-            this.buffer.Add(0x5);
+            this.buffer.Add(0x4);
             this.buffer.AddRange(ret);
             ret = buffer.ToArray();
             this.buffer = new List<byte>();

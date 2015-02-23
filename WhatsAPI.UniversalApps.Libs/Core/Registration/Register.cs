@@ -52,6 +52,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
                     id = GenerateIdentity(phoneNumber);
                 }
                 PhoneNumber pn = new PhoneNumber(phoneNumber);
+                await pn.ProcessPhoneNumber();
                 string token = System.Uri.EscapeDataString(GetTokenOfflineAsync(pn.Number));
                 request = string.Format("https://"+Constants.Information.WhatsRequestCodeHost+"?cc={0}&in={1}&to={0}{1}&method={2}&sim_mcc={3}&sim_mnc={4}&token={5}&id={6}&lg={7}&lc={8}", pn.CC, pn.Number, method, pn.MCC, pn.MNC, token, id, pn.ISO639, pn.ISO3166);
                 response = await HttpRequest.Get(request);
@@ -65,7 +66,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
                 }
                 result.IsSuccess = response.GetJsonValue("status") == "sent";
                 result.Password = "";
-                result.Response = response.GetJsonValue("reason").Length > 0 ? response.GetJsonValue("reason") : "Has Sent !Please try again later." ;
+                result.Response = response.GetJsonValue("reason")!=null ? response.GetJsonValue("reason") : "Has Sent !Please try again later." ;
                 return (result);
             }
             catch (Exception e)
@@ -86,7 +87,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
                     id = GenerateIdentity(phoneNumber);
                 }
                 PhoneNumber pn = new PhoneNumber(phoneNumber);
-
+                await pn.ProcessPhoneNumber();
                 string uri = string.Format("https://" + Constants.Information.WhatsRegisterHost + "?cc={0}&in={1}&id={2}&code={3}", pn.CC, pn.Number, id, code);
                 response = await HttpRequest.Get(uri);
                 if (response.GetJsonValue("status") == "ok")
@@ -111,7 +112,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Registration
                     id = GenerateIdentity(phoneNumber);
                 }
                 PhoneNumber pn = new PhoneNumber(phoneNumber);
-
+                 await pn.ProcessPhoneNumber();
                 string uri = string.Format("https://" + Constants.Information.WhatsCheckHost + "?cc={0}&in={1}&id={2}", pn.CC, pn.Number, id);
                 response = await HttpRequest.Get(uri);
                 if (response.GetJsonValue("status") == "ok")
