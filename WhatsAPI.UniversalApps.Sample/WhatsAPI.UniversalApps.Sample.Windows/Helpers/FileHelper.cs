@@ -13,12 +13,19 @@ namespace WhatsAPI.UniversalApps.Sample.Helpers
     {
         public static async Task WriteToFile(string file,byte[] data)
         {
-            var buffer = Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(data);
-            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(Windows.Storage.ApplicationData.Current.LocalFolder.Path);
-        
-            StorageFile sampleFile = await folder.CreateFileAsync(file, CreationCollisionOption.ReplaceExisting); ;
-           
-            await Windows.Storage.FileIO.WriteBufferAsync(sampleFile, buffer);
+            try
+            {
+                var buffer = Windows.Security.Cryptography.CryptographicBuffer.CreateFromByteArray(data);
+                StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(Windows.Storage.ApplicationData.Current.LocalFolder.Path);
+
+                StorageFile sampleFile = await folder.CreateFileAsync(file, CreationCollisionOption.ReplaceExisting); ;
+
+                await Windows.Storage.FileIO.WriteBufferAsync(sampleFile, buffer);
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         public static async Task<byte[]> ReadFile(string file)

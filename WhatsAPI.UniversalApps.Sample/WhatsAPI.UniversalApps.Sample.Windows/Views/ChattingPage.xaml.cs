@@ -17,6 +17,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Threading.Tasks;
 using System.Threading;
+using WhatsAPI.UniversalApps.Sample.ViewModels;
+using WhatsAPI.UniversalApps.Sample.Models;
 
 // The Split Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234234
 
@@ -29,12 +31,12 @@ namespace WhatsAPI.UniversalApps.Sample.Views
     public sealed partial class ChattingPage : Page
     {
         private NavigationHelper navigationHelper;
-        private ObservableDictionary defaultViewModel = new ObservableDictionary();
+        private ChatPageViewModel defaultViewModel = new ChatPageViewModel();
 
         /// <summary>
         /// This can be changed to a strongly typed view model.
         /// </summary>
-        public ObservableDictionary DefaultViewModel
+        public ChatPageViewModel DefaultViewModel
         {
             get { return this.defaultViewModel; }
         }
@@ -46,9 +48,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
         {
             get { return this.navigationHelper; }
         }
-        private Task listennerTask;
-        private Task aliveTask;
-        private CancellationTokenSource _cancelToken;
+        
         public ChattingPage()
         {
             this.InitializeComponent();
@@ -75,10 +75,11 @@ namespace WhatsAPI.UniversalApps.Sample.Views
 
         void itemListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (this.UsingLogicalPageNavigation())
-            {
-                this.navigationHelper.GoBackCommand.RaiseCanExecuteChanged();
-            }
+            this.ChatPage.Navigate(typeof(ChatDetailPage), e.AddedItems);
+            //if (this.UsingLogicalPageNavigation())
+            //{
+            //    this.navigationHelper.GoBackCommand.RaiseCanExecuteChanged();
+            //}
         }
 
         /// <summary>
@@ -128,12 +129,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
         /// serializable state.</param>
         private void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
-            if (this.itemsViewSource.View != null)
-            {
-                // TODO: Derive a serializable navigation parameter and assign it to
-                //       pageState("SelectedItem")
-
-            }
+            
         }
 
         #region Logical page navigation
@@ -179,6 +175,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
             // an item is selected this has the effect of changing from displaying the item list
             // to showing the selected item's details.  When the selection is cleared this has the
             // opposite effect.
+            this.ChatPage.Navigate(typeof(ChatDetailPage), (e.AddedItems[0] as Contacts));
             if (this.UsingLogicalPageNavigation()) this.InvalidateVisualState();
         }
 
@@ -201,11 +198,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
                 // item's details are currently displayed.  Clearing the selection will return to
                 // the item list.  From the user's point of view this is a logical backward
                 // navigation.
-                if (_cancelToken != null)
-                {
-                    _cancelToken.Cancel();
-                    _cancelToken = null;
-                }
+                
             }
             else
             {
@@ -251,9 +244,10 @@ namespace WhatsAPI.UniversalApps.Sample.Views
         /// The navigation parameter is available in the LoadState method 
         /// in addition to page state preserved during an earlier session.
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
+            
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -264,84 +258,12 @@ namespace WhatsAPI.UniversalApps.Sample.Views
         #endregion
 
 
-        private async void btnStartChat_Click(object sender, RoutedEventArgs e)
+        private void btnStartChat_Click(object sender, RoutedEventArgs e)
         {
-            this.ChatPage.Navigate(typeof(ChatDetailPage), txtTarget.Text.Trim());
-            try
-            {
-                await Start();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
-            }
+            //this.ChatPage.Navigate(typeof(ChatDetailPage), txtTarget.Text.Trim());
+            
         }
 
-        public async Task Start()
-        {
-            if (_cancelToken != null)
-            {
-                throw new InvalidOperationException("Task is already running!");
-            }
-            _cancelToken = new CancellationTokenSource();
-            this.listennerTask = Task.Factory.StartNew(() => this.Listen(_cancelToken.Token), _cancelToken.Token);
-            this.aliveTask = Task.Factory.StartNew(() => this.KeepAlive(_cancelToken.Token), _cancelToken.Token);
-            try
-            {
-                await listennerTask;
-                await aliveTask;
-            }
-            catch
-            {
-                throw;
-            }
-        }
-
-        public void Stop()
-        {
-            if (_cancelToken != null)
-            {
-                _cancelToken.Cancel();
-                _cancelToken = null;
-            }
-        }
-
-        private async Task KeepAlive(CancellationToken token)
-        {
-            if (!token.IsCancellationRequested)
-            {
-
-                await Task.Delay(150000);
-                SocketInstance.Instance.SendActive();
-
-            }
-        }
-        bool isError = false;
-        protected async Task Listen(CancellationToken token)
-        {
-
-            if (!token.IsCancellationRequested)
-            {
-                if (isError && SocketInstance.Instance != null)
-                {
-                    await SocketInstance.Instance.Connect();
-                    await SocketInstance.Instance.Login();
-                }
-
-                try
-                {
-                    await SocketInstance.Instance.PollMessages();
-                }
-                catch (Exception)
-                {
-                    //reset
-                    SocketInstance.Instance.Disconnect();
-                    isError = true;
-                    Stop();
-                    return;
-                }
-                await Task.Delay(500);
-            }
-        }
+       
     }
 }

@@ -49,6 +49,11 @@ namespace WhatsAPI.UniversalApps.Sample.Repositories
                 DBConnection.CreateTable<Contacts>();
                 DBConnection.CreateTable<Messages>();
             }
+            else
+            {
+                //check update database
+                
+            }
 
         }
 

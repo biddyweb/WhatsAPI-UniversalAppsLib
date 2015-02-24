@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using WhatsAPI.UniversalApps.Libs.Constants;
 using WhatsAPI.UniversalApps.Libs.Models;
+using WhatsAPI.UniversalApps.Sample.Models;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.System;
@@ -49,12 +51,12 @@ namespace WhatsAPI.UniversalApps.Sample.Views
 
         void Instance_OnGetMessageImage(Libs.Base.ProtocolTreeNode mediaNode, string from, string id, string fileName, int fileSize, string url, byte[] preview)
         {
-            this.AddNewImage(from, url);
+            this.AddNewImage(this.user.Nickname, url);
         }
 
         private void Instance_OnGetMessage(Libs.Base.ProtocolTreeNode messageNode, string from, string id, string name, string message, bool receipt_sent)
         {
-            this.AddNewText(from, message);
+            this.AddNewText(this.user.Nickname, message);
         }
 
         void timerTyping_Tick(object sender, object e)
@@ -73,20 +75,30 @@ namespace WhatsAPI.UniversalApps.Sample.Views
         {
             if (e.Parameter != null)
             {
-                string jid = e.Parameter as string;
+                Contacts contacts = e.Parameter as Contacts;
                 string server = "";
 
-                if (jid.Contains("-"))
+                if (contacts.jid != null)
                 {
-                    server = WhatsAPI.UniversalApps.Libs.Constants.Information.WhatsGroupChat;
-                    isGroup = true;
+                    if (contacts.jid.Contains("-"))
+                    {
+                        server = WhatsAPI.UniversalApps.Libs.Constants.Information.WhatsGroupChat;
+                        isGroup = true;
+                    }
+                    else
+                    {
+                        server = WhatsAPI.UniversalApps.Libs.Constants.Information.WhatsAppServer;
+                        isGroup = false;
+                    }
                 }
                 else
                 {
+                    contacts.jid = contacts.phoneNumber + "@" + Information.WhatsAppServer;
                     server = WhatsAPI.UniversalApps.Libs.Constants.Information.WhatsAppServer;
                     isGroup = false;
+                    
                 }
-                User user = new User(jid, server, "Billy Iphone");
+                User user = new User(contacts.jid, server, contacts.name);
                 this.user = user;
                 if (!isGroup)
                     processChat();
@@ -138,7 +150,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
             {
                 this.isTyping = true;
                 SocketInstance.Instance.SendComposing(this.user.GetFullJid());
-                this.timerTyping.Interval = new TimeSpan(10);
+                this.timerTyping.Interval = new TimeSpan(0,0,5);
                 this.timerTyping.Start();
             }
         }

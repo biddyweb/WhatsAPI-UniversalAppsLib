@@ -115,6 +115,7 @@
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="Constants\ConfigKey.cs" />
+    <Compile Include="Helpers\ContactHelper.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -124,6 +125,7 @@
     <Compile Include="Models\Messages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\DBProvider.cs" />
+    <Compile Include="Services\IRequestProvider.cs" />
     <Compile Include="SocketInstance.cs" />
     <Compile Include="ViewModels\ChatPageViewModel.cs" />
     <Compile Include="Views\ChatDetailPage.xaml.cs">
@@ -146,7 +148,11 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="Assets\client_secrets.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
+    <Compile Include="Services\Google.Contacts.v3.cs" />
     <None Include="WhatsAPI.UniversalApps.Sample.Windows_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +201,27 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Google.Apis">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Google.Apis.1.9.1\lib\netcore45\Google.Apis.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Auth">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Google.Apis.Auth.1.9.1\lib\netcore45\Google.Apis.Auth.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Auth.PlatformServices">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Google.Apis.Auth.1.9.1\lib\netcore45\Google.Apis.Auth.PlatformServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Core">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Google.Apis.Core.1.9.1\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Discovery.v1">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Google.Apis.Discovery.v1.1.9.0.490\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Discovery.v1.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.PlatformServices">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Google.Apis.1.9.1\lib\netcore45\Google.Apis.PlatformServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.Apis.Plus.v1">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Google.Apis.Plus.v1.1.9.0.2100\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Plus.v1.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Practices.Prism.Mvvm">
       <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Prism.Mvvm.1.1.1\lib\windows8\Microsoft.Practices.Prism.Mvvm.dll</HintPath>
     </Reference>
@@ -210,6 +237,18 @@
     <Reference Include="Microsoft.Practices.Prism.StoreApps.Windows">
       <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Prism.StoreApps.2.0.0\lib\windows8\Microsoft.Practices.Prism.StoreApps.Windows.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Threading.Tasks">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Microsoft.Bcl.Async.1.0.168\lib\win8\Microsoft.Threading.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Threading.Tasks.Extensions">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Microsoft.Bcl.Async.1.0.168\lib\win8\Microsoft.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Newtonsoft.Json.6.0.6\lib\netcore45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PhoneNumbers">
+      <HintPath>C:\Users\CyberCat\Downloads\PhoneNumbers.dll</HintPath>
+    </Reference>
     <Reference Include="SQLite.Net">
       <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\SQLite.Net-PCL.2.5.1\lib\portable-win8+net45+wp8+wpa81+MonoAndroid1+MonoTouch1\SQLite.Net.dll</HintPath>
     </Reference>
@@ -219,12 +258,26 @@
     <Reference Include="SQLite.Net.Platform.WinRT">
       <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\SQLite.Net.Platform.WinRT.2.5.1\lib\Windows8\SQLite.Net.Platform.WinRT.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http.Extensions">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Microsoft.Net.Http.2.2.28\lib\win8\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Microsoft.Net.Http.2.2.28\lib\win8\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="Zlib.Portable">
+      <HintPath>..\..\WhatsAPI.UniversalApps.Libs\packages\Zlib.Portable.1.10.0\lib\portable-net4+sl5+wp8+win8+wpa81+MonoTouch+MonoAndroid\Zlib.Portable.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="..\WhatsAPI.UniversalApps.Sample.Shared\WhatsAPI.UniversalApps.Sample.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <Import Project="..\..\WhatsAPI.UniversalApps.Libs\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\WhatsAPI.UniversalApps.Libs\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
+  <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
+    <Error Condition="!Exists('..\..\WhatsAPI.UniversalApps.Libs\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=317567." HelpKeyword="BCLBUILD2001" />
+    <Error Condition="Exists('..\..\WhatsAPI.UniversalApps.Libs\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

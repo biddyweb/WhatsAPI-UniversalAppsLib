@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using WhatsAPI.UniversalApps.Sample.Constants;
@@ -330,36 +331,45 @@ namespace WhatsAPI.UniversalApps.Sample.Common
             var password = config.Where(x => x.key == ConfigKey.Password).FirstOrDefault();
             var phone = config.Where(x => x.key == ConfigKey.PhoneNumber).FirstOrDefault();
 
-            if (SocketInstance.Instance == null)
-            {
-                SocketInstance.Create(phone.value, password.value, username.value);
-            }
-            
-            if (SocketInstance.Instance != null && SocketInstance.Instance.ConnectionStatus != WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.CONNECTED || SocketInstance.Instance.ConnectionStatus != WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.LOGGEDIN)
-            {
-                try
-                {
-                    await SocketInstance.Instance.Connect();
-                    SocketInstance.Instance.OnLoginSuccess += Instance_OnLoginSuccess;
-                    var challengeData = await FileHelper.ReadFile(ConfigKey.WhatsAppNextChallengeFile);
-                    if (challengeData != null)
-                    {
-
-                        await SocketInstance.Instance.Login(challengeData);
-                    }
-                    else
-                    {
-                        await SocketInstance.Instance.Login();
-                    }
-                }
-                catch (Exception ex)
-                {
-
-                }
-            }
+          
             
             if (e.NavigationMode == NavigationMode.New)
             {
+
+                if (String.IsNullOrEmpty(e.Parameter as String))
+                {
+                    if (SocketInstance.Instance == null)
+                    {
+                        SocketInstance.Create(phone.value, password.value, username.value);
+                        App.UserName = username.value;
+                        App.PhoneNumber = phone.value;
+                        App.Password = password.value;
+                    }
+
+                    if (SocketInstance.Instance != null && SocketInstance.Instance.ConnectionStatus != WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.CONNECTED || SocketInstance.Instance.ConnectionStatus != WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.LOGGEDIN)
+                    {
+                        try
+                        {
+                            
+                            await SocketInstance.Instance.Connect();
+                            SocketInstance.Instance.OnLoginSuccess += Instance_OnLoginSuccess;
+                            var challengeData = await FileHelper.ReadFile(ConfigKey.WhatsAppNextChallengeFile);
+                            if (challengeData != null)
+                            {
+
+                                await SocketInstance.Instance.Login(challengeData);
+                            }
+                            else
+                            {
+                                await SocketInstance.Instance.Login();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
                 // Clear existing state for forward navigation when adding a new page to the
                 // navigation stack
                 var nextPageKey = this._pageKey;
@@ -388,11 +398,90 @@ namespace WhatsAPI.UniversalApps.Sample.Common
             }
         }
 
-        void Instance_OnLoginSuccess(string phoneNumber, byte[] data)
+        async void Instance_OnLoginSuccess(string phoneNumber, byte[] data)
         {
-            
+            try
+            {
+                await Start();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+           await FileHelper.WriteToFile(ConfigKey.WhatsAppNextChallengeFile, data);
+           await ContactHelper.SyncGoogleContactsAsync();
         }
 
+        private Task listennerTask;
+        private Task aliveTask;
+        private CancellationTokenSource _cancelToken;
+
+        public async Task Start()
+        {
+            if (_cancelToken != null)
+            {
+                throw new InvalidOperationException("Task is already running!");
+            }
+            _cancelToken = new CancellationTokenSource();
+            this.listennerTask = Task.Factory.StartNew(() => this.Listen(_cancelToken.Token), _cancelToken.Token);
+            this.aliveTask = Task.Factory.StartNew(() => this.KeepAlive(_cancelToken.Token), _cancelToken.Token);
+            try
+            {
+                await listennerTask;
+                await aliveTask;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public void Stop()
+        {
+            if (_cancelToken != null)
+            {
+                _cancelToken.Cancel();
+                _cancelToken = null;
+            }
+        }
+
+        private async Task KeepAlive(CancellationToken token)
+        {
+            if (!token.IsCancellationRequested)
+            {
+
+                await Task.Delay(150000);
+                SocketInstance.Instance.SendActive();
+
+            }
+        }
+        bool isError = false;
+        protected async Task Listen(CancellationToken token)
+        {
+
+            if (!token.IsCancellationRequested)
+            {
+                if (isError && SocketInstance.Instance != null)
+                {
+                    await SocketInstance.Instance.Connect();
+                    await SocketInstance.Instance.Login();
+                }
+
+                try
+                {
+                    await SocketInstance.Instance.PollMessages();
+                }
+                catch (Exception)
+                {
+                    //reset
+                    SocketInstance.Instance.Disconnect();
+                    isError = true;
+                    Stop();
+                    return;
+                }
+                await Task.Delay(500);
+            }
+        }
         /// <summary>
         /// Invoked when this page will no longer be displayed in a Frame.
         /// This method calls <see cref="SaveState"/>, where all page specific
