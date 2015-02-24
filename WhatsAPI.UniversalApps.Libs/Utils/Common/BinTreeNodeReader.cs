@@ -165,8 +165,10 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             if (token2 == 2)
             {
                 return null;
+
             }
-            string tag = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetString(this.readBytes(token2), 0, this.readBytes(token2).Length);
+            var tagBytes = this.readBytes(token2);
+            string tag = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetString(tagBytes, 0, tagBytes.Length);
             var tmpAttributes = this.readAttributes(size);
 
             if ((size % 2) == 1)

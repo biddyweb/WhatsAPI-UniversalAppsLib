@@ -13,7 +13,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
 {
     public class Sockets
     {
-     /// <summary>
+        /// <summary>
         /// The time between sending and recieving
         /// </summary>
         private readonly int recvTimeout;
@@ -91,7 +91,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                     _readerPacket.InputStreamOptions = InputStreamOptions.Partial;
                     var endPoint = new HostName(this.whatsHost);
                     await this.socket.ConnectAsync(endPoint, this.whatsPort.ToString());
-                    
+
                     //socket.UpgradeToSslAsync(SocketProtectionLevel.SslAllowNullEncryption, new HostName(this.whatsHost));
                     //HandleConnect();
                     _transferredSize = 0;
@@ -166,9 +166,9 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
 
             //try
             //{
-                var byteReceived = await StartReceiving((uint)length);
-                receiveLength = byteReceived.Length;
-                //receiveLength = socket.Receive(buff, 0, length, 0);
+            var byteReceived = await StartReceiving((uint)length);
+            receiveLength = byteReceived.Length;
+            //receiveLength = socket.Receive(buff, 0, length, 0);
             //}
             //catch (Exception excpt)
             //{
@@ -257,7 +257,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                                    {
                                        if (!IsConnected)
                                        {
-                                          await Connect();
+                                           await Connect();
                                        }
 
                                        try
@@ -265,11 +265,16 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                                            uint bytesRead = await _readerPacket.LoadAsync(length);
                                            if (bytesRead == 0)
                                                return null;
-                                           return HandleReceive(bytesRead, _readerPacket,(int)length);
+                                           if (_readerPacket.UnconsumedBufferLength < length)
+                                           {
+                                                   return await StartReceiving(length);
+                                           }
+                                           return HandleReceive(bytesRead, _readerPacket, (int)length);
                                        }
                                        catch (Exception ex)
                                        {
-                                           throw new ConnectionException("Connection Lost");
+                                           WhatsAPI.UniversalApps.Libs.Utils.Logger.Log.WriteLog(ex.Message);
+                                           throw ex;
                                        }
                                    }
                                    catch (Exception ex)
@@ -280,14 +285,17 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
 
         }
 
-        private byte[] HandleReceive(uint bytesRead, DataReader readPacket,int length=1024*1024*5)
+        private byte[] HandleReceive(uint bytesRead, DataReader readPacket, int length = 1024*1024*5)
         {
+            var bufferSpace = length * 2;
             byte[] tmpRet = new byte[length];
-            var ibuffer = readPacket.ReadBuffer(readPacket.UnconsumedBufferLength);
+            Windows.Storage.Streams.IBuffer ibuffer = readPacket.ReadBuffer(readPacket.UnconsumedBufferLength);
             Byte[] convBuffer = WindowsRuntimeBufferExtensions.ToArray(ibuffer);
+            
             if (bytesRead > 0)
-                System.Buffer.BlockCopy(convBuffer, 0, tmpRet, (int)0, length);
+                System.Buffer.BlockCopy(convBuffer, 0, tmpRet, (int)0, (int)length);
             _transferredSize += bytesRead;
+           
             var kucing = System.Text.Encoding.UTF8.GetString(tmpRet, 0, tmpRet.Length);
             WhatsAPI.UniversalApps.Libs.Utils.Logger.Log.WriteLog("Receive Message => " + System.Text.Encoding.UTF8.GetString(tmpRet, 0, tmpRet.Length));
             return tmpRet;
@@ -298,7 +306,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
             if (!_isConnected)
                 Connect();
 
-            Task.Run(async() =>
+            Task.Run(async () =>
             {
                 await StartSending(sendBytes);
             });
@@ -318,7 +326,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                 throw new Exception("Failed to read node header");
             }
             int nodeLength = 0;
-            nodeLength  = (int)((nodeHeader[0] & 0x0F) << 16);
+            nodeLength = (int)((nodeHeader[0] & 0x0F) << 16);
             nodeLength |= (int)nodeHeader[1] << 8;
             nodeLength |= (int)nodeHeader[2] << 0;
 
@@ -345,25 +353,26 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
         //sending message
         private async Task StartSending(byte[] sendBytes)
         {
-            await Task.Run(async() => { 
-            try
+            await Task.Run(async () =>
             {
-
-                if (!IsConnected)
+                try
                 {
-                    await Connect();
+
+                    if (!IsConnected)
+                    {
+                        await Connect();
+                    }
+                    WhatsAPI.UniversalApps.Libs.Utils.Logger.Log.WriteLog("Sending Data =>" + System.Text.Encoding.UTF8.GetString(sendBytes, 0, sendBytes.Length));
+                    _writePacket.WriteBytes(sendBytes);
+                    await _writePacket.StoreAsync();
                 }
-                WhatsAPI.UniversalApps.Libs.Utils.Logger.Log.WriteLog("Sending Data =>" + System.Text.Encoding.UTF8.GetString(sendBytes, 0, sendBytes.Length));
-                _writePacket.WriteBytes(sendBytes);
-                await _writePacket.StoreAsync();
-            }
-            catch (Exception ex)
-            {
+                catch (Exception ex)
+                {
 
 
-            }
-        });
+                }
+            });
+        }
     }
-    }
-    }
+}
 
