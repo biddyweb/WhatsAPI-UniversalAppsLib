@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BBDF534A-0D6C-46B2-93C4-8F7EEBAFD8BA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WhatsAPI.UniversalApps.Libs</RootNamespace>
+    <AssemblyName>WhatsAPI.UniversalApps.Libs</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile32</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- A reference to the entire .NET Framework is automatically included -->
+    <Content Include="Files\old.countries.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <TargetPlatform Include="WindowsPhoneApp, Version=8.1" />
+    <TargetPlatform Include="Windows, Version=8.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base\FMessage.cs" />
+    <Compile Include="Base\FMessageVisitor.cs" />
+    <Compile Include="Base\KeyStream.cs" />
+    <Compile Include="Base\KeyValue.cs" />
+    <Compile Include="Base\ProtocolTreeNode.cs" />
+    <Compile Include="Constants\Enums.cs" />
+    <Compile Include="Constants\Information.cs" />
+    <Compile Include="Constants\Token.cs" />
+    <Compile Include="Core\Connection\Sockets.cs" />
+    <Compile Include="Core\Encryption\CryptoTools.cs" />
+    <Compile Include="Core\Encryption\HashAlgorithm.cs" />
+    <Compile Include="Core\Encryption\HMACSHA1\HMac.cs" />
+    <Compile Include="Core\Encryption\HMACSHA1\HMACSHA1.cs" />
+    <Compile Include="Core\Encryption\ICryptoTransform.cs" />
+    <Compile Include="Core\Encryption\KeyedHashAlgorithm.cs" />
+    <Compile Include="Core\Encryption\KeyNumber.cs" />
+    <Compile Include="Core\Encryption\KeySizes.cs" />
+    <Compile Include="Core\Encryption\RandomNumberGenerator.cs" />
+    <Compile Include="Core\Encryption\Rfc2898DeriveBytes\DeriveBytes.cs" />
+    <Compile Include="Core\Encryption\Rfc2898DeriveBytes\Rfc2898DeriveBytes.cs" />
+    <Compile Include="Core\Encryption\SHA1\SHA1.cs" />
+    <Compile Include="Core\Encryption\SHA1\SHA1CryptoProvider.cs" />
+    <Compile Include="Core\Encryption\SHA1\SHA1Managed.cs" />
+    <Compile Include="Core\Events\EventBase.cs" />
+    <Compile Include="Core\Events\EventsHandler.cs" />
+    <Compile Include="Core\Exceptions\ConnectionException.cs" />
+    <Compile Include="Core\Messaging\MessagingBase.cs" />
+    <Compile Include="Core\Messaging\SendMessageBase.cs" />
+    <Compile Include="Core\Registration\Register.cs" />
+    <Compile Include="Core\Registration\Token.cs" />
+    <Compile Include="Extensions\CultureInfoExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Models\AccountInfo.cs" />
+    <Compile Include="Models\GroupInfo.cs" />
+    <Compile Include="Models\GroupSetting.cs" />
+    <Compile Include="Models\PhoneNumber.cs" />
+    <Compile Include="Models\RegisterResponse.cs" />
+    <Compile Include="Models\TokenMap.cs" />
+    <Compile Include="Models\UploadResponse.cs" />
+    <Compile Include="Models\User.cs" />
+    <Compile Include="Utils\Common\BinTreeNodeWriter.cs" />
+    <Compile Include="Utils\Common\BinTreeNodeReader.cs" />
+    <Compile Include="Utils\Common\FileHelper.cs" />
+    <Compile Include="Utils\Common\Helpers.cs" />
+    <Compile Include="Utils\Common\HttpRequest.cs" />
+    <Compile Include="Utils\Common\StringManipulation.cs" />
+    <Compile Include="Utils\Encryptions\MD5.cs" />
+    <Compile Include="Utils\Encryptions\PKBDF.cs" />
+    <Compile Include="Utils\Encryptions\SHA1.cs" />
+    <Compile Include="Utils\Logger\Log.cs" />
+    <Compile Include="Utils\Messaging\TicketManager.cs" />
+    <Compile Include="WhatsApp.cs" />
+    <Compile Include="Events\WhatsAppEventListener.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\Encryptions\RC4.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Files\countries.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\networkInfo.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

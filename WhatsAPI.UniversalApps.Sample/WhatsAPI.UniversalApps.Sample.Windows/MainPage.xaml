@@ -1,0 +1,34 @@
+﻿<Page
+    x:Class="WhatsAPI.UniversalApps.Sample.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WhatsAPI.UniversalApps.Sample"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Button x:Name="btnRegister" Content="Register" HorizontalAlignment="Center" Click="btnRegister_Click"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
+            <TextBox PlaceholderText="Input your verification code from Whatsapp" Margin="12" x:Name="txtCode"></TextBox>
+            <Button x:Name="btnConfirm" Content="Verify" Margin="12" Click="btnConfirm_Click"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center">
+            <TextBox PlaceholderText="Your Nickname" Margin="12" x:Name="txtNickName"></TextBox>
+            <TextBox PlaceholderText="Your Phone Number with International Code , Ex : 62xxxxxxxxxx" Margin="12" x:Name="txtUsername"></TextBox>
+            <PasswordBox x:Name="txtPassword" PlaceholderText="Your Whatsapp Password" Margin="12"/>
+            <Button x:Name="btnLogin" Content="Login" Margin="12" Click="btnLogin_Click"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Center">
+            <TextBox PlaceholderText="Your Chat Destination ( 628xxxx ) " Margin="12" x:Name="txtDestination"></TextBox>
+            <TextBox PlaceholderText="Your Message" Margin="12" x:Name="txtMessage"></TextBox>
+            <Button x:Name="btnSend" Content="Send" Margin="12" Click="btnSend_Click" IsEnabled="False"/>
+        </StackPanel>
+    </Grid>
+</Page>
