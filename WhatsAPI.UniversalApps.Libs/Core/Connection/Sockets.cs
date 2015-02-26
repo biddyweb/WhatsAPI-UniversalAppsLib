@@ -5,6 +5,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsAPI.UniversalApps.Libs.Core.Exceptions;
+using Windows.Foundation;
 using Windows.Networking;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
@@ -262,7 +263,9 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
 
                                        try
                                        {
-                                           uint bytesRead = await _readerPacket.LoadAsync(length);
+                                           IAsyncOperation<uint> taskLoad = _readerPacket.LoadAsync(length);
+                                           taskLoad.AsTask().Wait();
+                                           uint bytesRead = taskLoad.GetResults();
                                            if (bytesRead == 0)
                                                return null;
                                            if (_readerPacket.UnconsumedBufferLength < length)

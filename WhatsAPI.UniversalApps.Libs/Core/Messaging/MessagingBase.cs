@@ -8,6 +8,13 @@ using WhatsAPI.UniversalApps.Libs.Core.Connection;
 using WhatsAPI.UniversalApps.Libs.Core.Exceptions;
 using WhatsAPI.UniversalApps.Libs.Models;
 using WhatsAPI.UniversalApps.Libs.Utils.Common;
+using Windows.Storage.Streams;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Graphics.Imaging;
+using Windows.Storage;
+using System.IO;
 
 namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
 {
@@ -207,5 +214,89 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                     throw new Exception(string.Format("Cound not parse {0} as privacy setting", data));
             }
         }
+
+        protected async Task< byte[]> CreateThumbnail(byte[] imageData)
+        {
+            BitmapImage image = null;
+            image = await ImageHelper.ByteArrayToImageAsync(imageData);
+            var file = await FileHelper.SaveFileFromByteArray(imageData);
+            if (image != null)
+            {
+                int newHeight = 0;
+                int newWidth = 0;
+                float imgWidth = float.Parse(image.PixelWidth.ToString());
+                float imgHeight = float.Parse(image.PixelHeight.ToString());
+                if (image.PixelWidth > image.PixelHeight)
+                {
+                    newHeight = (int)((imgHeight / imgWidth) * 100);
+                    newWidth = 100;
+                }
+                else
+                {
+                    newWidth = (int)((imgWidth / imgHeight) * 100);
+                    newHeight = 100;
+                }
+
+                var cropImage = await ImageHelper.ResizeImage(file, (uint)newHeight, (uint)newWidth);
+                await FileHelper.SaveFileFromByteArray(cropImage,"tempPhotoProfile.jpg");
+                return cropImage;    
+            }
+            return null;
+        }
+
+        protected static DateTime GetDateTimeFromTimestamp(string timestamp)
+        {
+            long data = 0;
+            if (long.TryParse(timestamp, out data))
+            {
+                return GetDateTimeFromTimestamp(data);
+            }
+            return DateTime.Now;
+        }
+
+        protected static DateTime GetDateTimeFromTimestamp(long timestamp)
+        {
+            DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return UnixEpoch.AddSeconds(timestamp);
+        }
+
+        
+        protected async  Task<byte[]> ProcessProfilePicture(byte[] bytes)
+        {
+            BitmapImage image = null;
+            image = await ImageHelper.ByteArrayToImageAsync(bytes);
+            var file = await FileHelper.SaveFileFromByteArray(bytes);
+            if (image != null)
+            {
+                
+                int size = 640;
+                if (size > image.PixelWidth)
+                    size = image.PixelWidth;
+                if (size > image.PixelHeight)
+                    size = image.PixelHeight;
+
+                int newHeight = 0;
+                int newWidth = 0;
+                float imgWidth = float.Parse(image.PixelWidth.ToString());
+                float imgHeight = float.Parse(image.PixelHeight.ToString());
+                if (image.PixelWidth < image.PixelHeight)
+                {
+                    newHeight = (int)((imgHeight / imgWidth) * size);
+                    newWidth = size;
+                }
+                else
+                {
+                    newWidth = (int)((imgWidth / imgHeight) * size);
+                    newHeight = size;
+                }
+
+                var cropImage = await ImageHelper.ResizeImage(file, (uint)newHeight, (uint)newWidth);
+                await FileHelper.SaveFileFromByteArray(cropImage);
+                return cropImage;    
+            }
+            return bytes;
+        }
+       
+      
     }
 }

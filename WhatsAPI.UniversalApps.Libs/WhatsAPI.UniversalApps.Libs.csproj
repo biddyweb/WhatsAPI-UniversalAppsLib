@@ -67,6 +67,9 @@
     <Compile Include="Core\Encryption\SHA1\SHA1.cs" />
     <Compile Include="Core\Encryption\SHA1\SHA1CryptoProvider.cs" />
     <Compile Include="Core\Encryption\SHA1\SHA1Managed.cs" />
+    <Compile Include="Core\Encryption\SHA256\SHA256.cs" />
+    <Compile Include="Core\Encryption\SHA256\SHA256Managed.cs" />
+    <Compile Include="Core\Encryption\SHA256\SHAConstants.cs" />
     <Compile Include="Core\Events\EventBase.cs" />
     <Compile Include="Core\Events\EventsHandler.cs" />
     <Compile Include="Core\Exceptions\ConnectionException.cs" />
@@ -84,11 +87,13 @@
     <Compile Include="Models\TokenMap.cs" />
     <Compile Include="Models\UploadResponse.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="SHa256.cs" />
     <Compile Include="Utils\Common\BinTreeNodeWriter.cs" />
     <Compile Include="Utils\Common\BinTreeNodeReader.cs" />
     <Compile Include="Utils\Common\FileHelper.cs" />
     <Compile Include="Utils\Common\Helpers.cs" />
     <Compile Include="Utils\Common\HttpRequest.cs" />
+    <Compile Include="Utils\Common\ImageHelper.cs" />
     <Compile Include="Utils\Common\StringManipulation.cs" />
     <Compile Include="Utils\Encryptions\MD5.cs" />
     <Compile Include="Utils\Encryptions\PKBDF.cs" />
@@ -107,6 +112,14 @@
     <Content Include="Files\networkInfo.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>packages\Newtonsoft.Json.6.0.8\lib\portable-net40+sl5+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

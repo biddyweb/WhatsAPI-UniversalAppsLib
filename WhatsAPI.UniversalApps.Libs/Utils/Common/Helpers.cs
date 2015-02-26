@@ -132,5 +132,18 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             return response.ToString().Trim();
         }
         #endregion
+
+        #region SplitText
+
+        public static string[] Split(string str,char[] search)
+        {
+            return str.Split(search);
+        }
+
+        public static string[] Split(string str, char search)
+        {
+            return str.Split(search);
+        }
+        #endregion
     }
 }

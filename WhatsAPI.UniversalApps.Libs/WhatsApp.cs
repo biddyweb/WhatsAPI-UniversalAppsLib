@@ -9,6 +9,12 @@ using WhatsAPI.UniversalApps.Libs.Utils.Common;
 using WhatsAPI.UniversalApps.Libs.Utils.Messaging;
 using WhatsAPI.UniversalApps.Libs.Constants;
 using WhatsAPI.UniversalApps.Libs.Models;
+using System.Threading.Tasks;
+using WhatsAPI.UniversalApps.Libs.Utils.Encryptions;
+using Newtonsoft.Json;
+using WhatsAPI.UniversalApps.Libs.Core.Encryption;
+using WhatsAPI.UniversalApps.Libs.Core.Encryption.SHA256;
+using Windows.Foundation;
 
 namespace WhatsAPI.UniversalApps.Libs
 {
@@ -62,7 +68,7 @@ namespace WhatsAPI.UniversalApps.Libs
             this.SendNode(node);
         }
 
-       
+
 
         protected void SendQrSync(byte[] qrkey, byte[] token = null)
         {
@@ -149,7 +155,7 @@ namespace WhatsAPI.UniversalApps.Libs
 
         protected void SendChatState(string to, string type)
         {
-            var node = new ProtocolTreeNode("chatstate", new[] { new KeyValue("to",Helpers.GetJID(to)) }, new[] { 
+            var node = new ProtocolTreeNode("chatstate", new[] { new KeyValue("to", Helpers.GetJID(to)) }, new[] { 
                 new ProtocolTreeNode(type, null)
             });
             this.SendNode(node);
@@ -345,7 +351,7 @@ namespace WhatsAPI.UniversalApps.Libs
             this.SendMessageBroadcast(to, new FMessage(string.Empty, true) { data = message, media_wa_type = FMessage.Type.Undefined });
         }
 
-        
+
 
         public void SendMessageBroadcast(string[] to, FMessage message)
         {
@@ -432,7 +438,7 @@ namespace WhatsAPI.UniversalApps.Libs
             this.SendNode(node);
         }
 
-       
+
 
         public void SendSetPrivacyBlockedList(IEnumerable<string> jidSet)
         {
@@ -623,370 +629,358 @@ namespace WhatsAPI.UniversalApps.Libs
         }
 
         #region Message Multimedia
-        //public void SendMessageBroadcastImage(string[] recipients, byte[] ImageData, WhatsAPI.UniversalApps.Libs.Constants.Enums.ImageType imgtype)
-        //{
-        //    string to;
-        //    List<string> foo = new List<string>();
-        //    foreach (string s in recipients)
-        //    {
-        //        foo.Add(Helpers.GetJID(s));
-        //    }
-        //    to = string.Join(",", foo.ToArray());
-        //    FMessage msg = this.getFmessageImage(to, ImageData, imgtype);
-        //    if (msg != null)
-        //    {
-        //        this.SendMessage(msg);
-        //    }
-        //}
+        public async void SendMessageBroadcastImage(string[] recipients, byte[] ImageData, WhatsAPI.UniversalApps.Libs.Constants.Enums.ImageType imgtype)
+        {
+            string to;
+            List<string> foo = new List<string>();
+            foreach (string s in recipients)
+            {
+                foo.Add(Helpers.GetJID(s));
+            }
+            to = string.Join(",", foo.ToArray());
+            FMessage msg = await this.getFmessageImage(to, ImageData, imgtype);
+            if (msg != null)
+            {
+                this.SendMessage(msg);
+            }
+        }
 
-        //public void SendMessageBroadcastAudio(string[] recipients, byte[] AudioData, WhatsAPI.UniversalApps.Libs.Constants.Enums.AudioType audtype)
-        //{
-        //    string to;
-        //    List<string> foo = new List<string>();
-        //    foreach (string s in recipients)
-        //    {
-        //        foo.Add(Helpers.GetJID(s));
-        //    }
-        //    to = string.Join(",", foo.ToArray());
-        //    FMessage msg = this.getFmessageAudio(to, AudioData, audtype);
-        //    if (msg != null)
-        //    {
-        //        this.SendMessage(msg);
-        //    }
-        //}
+        public async void SendMessageBroadcastAudio(string[] recipients, byte[] AudioData, WhatsAPI.UniversalApps.Libs.Constants.Enums.AudioType audtype)
+        {
+            string to;
+            List<string> foo = new List<string>();
+            foreach (string s in recipients)
+            {
+                foo.Add(Helpers.GetJID(s));
+            }
+            to = string.Join(",", foo.ToArray());
+            FMessage msg = await this.getFmessageAudio(to, AudioData, audtype);
+            if (msg != null)
+            {
+                this.SendMessage(msg);
+            }
+        }
 
-        //public void SendMessageBroadcastVideo(string[] recipients, byte[] VideoData, WhatsAPI.UniversalApps.Libs.Constants.Enums.VideoType vidtype)
-        //{
-        //    string to;
-        //    List<string> foo = new List<string>();
-        //    foreach (string s in recipients)
-        //    {
-        //        foo.Add(Helpers.GetJID(s));
-        //    }
-        //    to = string.Join(",", foo.ToArray());
-        //    FMessage msg = this.getFmessageVideo(to, VideoData, vidtype);
-        //    if (msg != null)
-        //    {
-        //        this.SendMessage(msg);
-        //    }
-        //}
-        //public void SendSetPhoto(byte[] bytes, byte[] thumbnailBytes = null)
-        //{
-        //    string id = TicketCounter.MakeId("set_photo_");
+        public async void SendMessageBroadcastVideo(string[] recipients, byte[] VideoData, WhatsAPI.UniversalApps.Libs.Constants.Enums.VideoType vidtype)
+        {
+            string to;
+            List<string> foo = new List<string>();
+            foreach (string s in recipients)
+            {
+                foo.Add(Helpers.GetJID(s));
+            }
+            to = string.Join(",", foo.ToArray());
+            FMessage msg = await this.getFmessageVideo(to, VideoData, vidtype);
+            if (msg != null)
+            {
+                this.SendMessage(msg);
+            }
+        }
+        public async void SendSetPhoto(byte[] bytes, byte[] thumbnailBytes = null)
+        {
+            string id = TicketCounter.MakeId("set_photo_");
 
-        //    bytes = this.ProcessProfilePicture(bytes);
+            bytes = await this.ProcessProfilePicture(bytes);
 
-        //    var list = new List<ProtocolTreeNode> { new ProtocolTreeNode("picture", null, null, bytes) };
+            var list = new List<ProtocolTreeNode> { new ProtocolTreeNode("picture", null, null, bytes) };
 
-        //    if (thumbnailBytes == null)
-        //    {
-        //        //auto generate
-        //        thumbnailBytes = this.CreateThumbnail(bytes);
-        //    }
+            if (thumbnailBytes == null)
+            {
+                //auto generate
+                thumbnailBytes = await this.CreateThumbnail(bytes);
+            }
 
-        //    //debug
-        //    System.IO.File.WriteAllBytes("pic.jpg", bytes);
-        //    System.IO.File.WriteAllBytes("picthumb.jpg", thumbnailBytes);
+            //debug
+            await FileHelper.SaveFileFromByteArray(bytes, "pic.jpg");
+            await FileHelper.SaveFileFromByteArray(thumbnailBytes, "pic.jpg");
 
-        //    if (thumbnailBytes != null)
-        //    {
-        //        list.Add(new ProtocolTreeNode("picture", new[] { new KeyValue("type", "preview") }, null, thumbnailBytes));
-        //    }
-        //    var node = new ProtocolTreeNode("iq", new[] { new KeyValue("id", id), new KeyValue("type", "set"), new KeyValue("xmlns", "w:profile:picture"), new KeyValue("to", Helpers.GetJID(this.phoneNumber)) }, list.ToArray());
-        //    this.SendNode(node);
-        //}
+            if (thumbnailBytes != null)
+            {
+                list.Add(new ProtocolTreeNode("picture", new[] { new KeyValue("type", "preview") }, null, thumbnailBytes));
+            }
+            var node = new ProtocolTreeNode("iq", new[] { new KeyValue("id", id), new KeyValue("type", "set"), new KeyValue("xmlns", "w:profile:picture"), new KeyValue("to", Helpers.GetJID(this.phoneNumber)) }, list.ToArray());
+            this.SendNode(node);
+        }
 
-        //public void SendMessageImage(string to, byte[] ImageData, WhatsAPI.UniversalApps.Libs.Constants.Enums.ImageType imgtype)
-        //{
-        //    FMessage msg = this.getFmessageImage(to, ImageData, imgtype);
-        //    if (msg != null)
-        //    {
-        //        this.SendMessage(msg);
-        //    }
-        //}
+        public async void SendMessageImage(string to, byte[] ImageData, WhatsAPI.UniversalApps.Libs.Constants.Enums.ImageType imgtype)
+        {
+            FMessage msg = await this.getFmessageImage(to, ImageData, imgtype);
+            if (msg != null)
+            {
+                this.SendMessage(msg);
+            }
+        }
 
-        //protected FMessage getFmessageImage(string to, byte[] ImageData, WhatsAPI.UniversalApps.Libs.Constants.Enums.ImageType imgtype)
-        //{
-        //    string type = string.Empty;
-        //    string extension = string.Empty;
-        //    switch (imgtype)
-        //    {
-        //        case ImageType.PNG:
-        //            type = "image/png";
-        //            extension = "png";
-        //            break;
-        //        case ImageType.GIF:
-        //            type = "image/gif";
-        //            extension = "gif";
-        //            break;
-        //        default:
-        //            type = "image/jpeg";
-        //            extension = "jpg";
-        //            break;
-        //    }
+        protected async Task<FMessage> getFmessageImage(string to, byte[] ImageData, WhatsAPI.UniversalApps.Libs.Constants.Enums.ImageType imgtype)
+        {
+            string type = string.Empty;
+            string extension = string.Empty;
+            switch (imgtype)
+            {
+                case WhatsAPI.UniversalApps.Libs.Constants.Enums.ImageType.PNG:
+                    type = "image/png";
+                    extension = "png";
+                    break;
+                case WhatsAPI.UniversalApps.Libs.Constants.Enums.ImageType.GIF:
+                    type = "image/gif";
+                    extension = "gif";
+                    break;
+                default:
+                    type = "image/jpeg";
+                    extension = "jpg";
+                    break;
+            }
 
-        //    //create hash
-        //    string filehash = string.Empty;
-        //    using (HashAlgorithm sha = HashAlgorithm.Create("sha256"))
-        //    {
-        //        byte[] raw = sha.ComputeHash(ImageData);
-        //        filehash = Convert.ToBase64String(raw);
-        //    }
+            //create hash
+            string filehash = string.Empty;
+            SHA256 sha = SHA256.Create();
+            byte[] raw = sha.ComputeHash(ImageData);
+            filehash = Convert.ToBase64String(raw);
 
-        //    //request upload
-        //    WaUploadResponse response = this.UploadFile(filehash, "image", ImageData.Length, ImageData, to, type, extension);
 
-        //    if (response != null && !String.IsNullOrEmpty(response.url))
-        //    {
-        //        //send message
-        //        FMessage msg = new FMessage(to, true)
-        //        {
-        //            media_wa_type = FMessage.Type.Image,
-        //            media_mime_type = response.mimetype,
-        //            media_name = response.url.Split('/').Last(),
-        //            media_size = response.size,
-        //            media_url = response.url,
-        //            binary_data = this.CreateThumbnail(ImageData)
-        //        };
-        //        return msg;
-        //    }
-        //    return null;
-        //}
+            //request upload
+            UploadResponse response = await this.UploadFile(filehash, "image", ImageData.Length, ImageData, to, type, extension);
 
-        //public void SendMessageVideo(string to, byte[] videoData, VideoType vidtype)
-        //{
-        //    FMessage msg = this.getFmessageVideo(to, videoData, vidtype);
-        //    if (msg != null)
-        //    {
-        //        this.SendMessage(msg);
-        //    }
-        //}
+            if (response != null && !String.IsNullOrEmpty(response.url))
+            {
+                //send message
+                FMessage msg = new FMessage(to, true)
+                {
+                    media_wa_type = FMessage.Type.Image,
+                    media_mime_type = response.mimetype,
+                    media_name = response.url.Split('/').Last(),
+                    media_size = response.size,
+                    media_url = response.url,
+                    binary_data = await this.CreateThumbnail(ImageData)
+                };
+                return msg;
+            }
+            return null;
+        }
 
-        //protected FMessage getFmessageVideo(string to, byte[] videoData, VideoType vidtype)
-        //{
-        //    to = Helpers.GetJID(to);
-        //    string type = string.Empty;
-        //    string extension = string.Empty;
-        //    switch (vidtype)
-        //    {
-        //        case VideoType.MOV:
-        //            type = "video/quicktime";
-        //            extension = "mov";
-        //            break;
-        //        case VideoType.AVI:
-        //            type = "video/x-msvideo";
-        //            extension = "avi";
-        //            break;
-        //        default:
-        //            type = "video/mp4";
-        //            extension = "mp4";
-        //            break;
-        //    }
+        public async void SendMessageVideo(string to, byte[] videoData, WhatsAPI.UniversalApps.Libs.Constants.Enums.VideoType vidtype)
+        {
+            FMessage msg = await this.getFmessageVideo(to, videoData, vidtype);
+            if (msg != null)
+            {
+                this.SendMessage(msg);
+            }
+        }
 
-        //    //create hash
-        //    string filehash = string.Empty;
-        //    using (HashAlgorithm sha = HashAlgorithm.Create("sha256"))
-        //    {
-        //        byte[] raw = sha.ComputeHash(videoData);
-        //        filehash = Convert.ToBase64String(raw);
-        //    }
+        protected async Task<FMessage> getFmessageVideo(string to, byte[] videoData, WhatsAPI.UniversalApps.Libs.Constants.Enums.VideoType vidtype)
+        {
+            to = Helpers.GetJID(to);
+            string type = string.Empty;
+            string extension = string.Empty;
+            switch (vidtype)
+            {
+                case WhatsAPI.UniversalApps.Libs.Constants.Enums.VideoType.MOV:
+                    type = "video/quicktime";
+                    extension = "mov";
+                    break;
+                case WhatsAPI.UniversalApps.Libs.Constants.Enums.VideoType.AVI:
+                    type = "video/x-msvideo";
+                    extension = "avi";
+                    break;
+                default:
+                    type = "video/mp4";
+                    extension = "mp4";
+                    break;
+            }
 
-        //    //request upload
-        //    WaUploadResponse response = this.UploadFile(filehash, "video", videoData.Length, videoData, to, type, extension);
+            //create hash
+            string filehash = string.Empty;
+            SHA256 sha = SHA256.Create();
+            byte[] raw = sha.ComputeHash(videoData);
+            filehash = Convert.ToBase64String(raw);
 
-        //    if (response != null && !String.IsNullOrEmpty(response.url))
-        //    {
-        //        //send message
-        //        FMessage msg = new FMessage(to, true)
-        //        {
-        //            media_wa_type = FMessage.Type.Video,
-        //            media_mime_type = response.mimetype,
-        //            media_name = response.url.Split('/').Last(),
-        //            media_size = response.size,
-        //            media_url = response.url,
-        //            media_duration_seconds = response.duration
-        //        };
-        //        return msg;
-        //    }
-        //    return null;
-        //}
 
-        //public void SendMessageAudio(string to, byte[] audioData, AudioType audtype)
-        //{
-        //    FMessage msg = this.getFmessageAudio(to, audioData, audtype);
-        //    if (msg != null)
-        //    {
-        //        this.SendMessage(msg);
-        //    }
-        //}
+            //request upload
+            UploadResponse response = await this.UploadFile(filehash, "video", videoData.Length, videoData, to, type, extension);
 
-        //protected FMessage getFmessageAudio(string to, byte[] audioData, AudioType audtype)
-        //{
-        //    to = Helpers.GetJID(to);
-        //    string type = string.Empty;
-        //    string extension = string.Empty;
-        //    switch (audtype)
-        //    {
-        //        case AudioType.WAV:
-        //            type = "audio/wav";
-        //            extension = "wav";
-        //            break;
-        //        case AudioType.OGG:
-        //            type = "audio/ogg";
-        //            extension = "ogg";
-        //            break;
-        //        default:
-        //            type = "audio/mpeg";
-        //            extension = "mp3";
-        //            break;
-        //    }
+            if (response != null && !String.IsNullOrEmpty(response.url))
+            {
+                //send message
+                FMessage msg = new FMessage(to, true)
+                {
+                    media_wa_type = FMessage.Type.Video,
+                    media_mime_type = response.mimetype,
+                    media_name = response.url.Split('/').Last(),
+                    media_size = response.size,
+                    media_url = response.url,
+                    media_duration_seconds = response.duration
+                };
+                return msg;
+            }
+            return null;
+        }
 
-        //    //create hash
-        //    string filehash = string.Empty;
-        //    using (HashAlgorithm sha = HashAlgorithm.Create("sha256"))
-        //    {
-        //        byte[] raw = sha.ComputeHash(audioData);
-        //        filehash = Convert.ToBase64String(raw);
-        //    }
+        public async Task SendMessageAudio(string to, byte[] audioData, WhatsAPI.UniversalApps.Libs.Constants.Enums.AudioType audtype)
+        {
+            FMessage msg = await this.getFmessageAudio(to, audioData, audtype);
+            if (msg != null)
+            {
+                this.SendMessage(msg);
+            }
+        }
 
-        //    //request upload
-        //    WaUploadResponse response = this.UploadFile(filehash, "audio", audioData.Length, audioData, to, type, extension);
+        protected async Task<FMessage> getFmessageAudio(string to, byte[] audioData, WhatsAPI.UniversalApps.Libs.Constants.Enums.AudioType audtype)
+        {
+            to = Helpers.GetJID(to);
+            string type = string.Empty;
+            string extension = string.Empty;
+            switch (audtype)
+            {
+                case WhatsAPI.UniversalApps.Libs.Constants.Enums.AudioType.WAV:
+                    type = "audio/wav";
+                    extension = "wav";
+                    break;
+                case WhatsAPI.UniversalApps.Libs.Constants.Enums.AudioType.OGG:
+                    type = "audio/ogg";
+                    extension = "ogg";
+                    break;
+                default:
+                    type = "audio/mpeg";
+                    extension = "mp3";
+                    break;
+            }
 
-        //    if (response != null && !String.IsNullOrEmpty(response.url))
-        //    {
-        //        //send message
-        //        FMessage msg = new FMessage(to, true)
-        //        {
-        //            media_wa_type = FMessage.Type.Audio,
-        //            media_mime_type = response.mimetype,
-        //            media_name = response.url.Split('/').Last(),
-        //            media_size = response.size,
-        //            media_url = response.url,
-        //            media_duration_seconds = response.duration
-        //        };
-        //        return msg;
-        //    }
-        //    return null;
-        //}
+            //create hash
+            string filehash = string.Empty;
+            using (HashAlgorithm sha = HashAlgorithm.Create("sha256"))
+            {
+                byte[] raw = sha.ComputeHash(audioData);
+                filehash = Convert.ToBase64String(raw);
+            }
 
-        //protected WaUploadResponse UploadFile(string b64hash, string type, long size, byte[] fileData, string to, string contenttype, string extension)
-        //{
-        //    ProtocolTreeNode media = new ProtocolTreeNode("media", new KeyValue[] {
-        //        new KeyValue("hash", b64hash),
-        //        new KeyValue("type", type),
-        //        new KeyValue("size", size.ToString())
-        //    });
-        //    string id = TicketManager.GenerateId();
-        //    ProtocolTreeNode node = new ProtocolTreeNode("iq", new KeyValue[] {
-        //        new KeyValue("id", id),
-        //        new KeyValue("to", WhatsConstants.WhatsAppServer),
-        //        new KeyValue("type", "set"),
-        //        new KeyValue("xmlns", "w:m")
-        //    }, media);
-        //    this.uploadResponse = null;
-        //    this.SendNode(node);
-        //    int i = 0;
-        //    while (this.uploadResponse == null && i <= 10)
-        //    {
-        //        i++;
-        //        this.pollMessage();
-        //    }
-        //    if (this.uploadResponse != null && this.uploadResponse.GetChild("duplicate") != null)
-        //    {
-        //        WaUploadResponse res = new WaUploadResponse(this.uploadResponse);
-        //        this.uploadResponse = null;
-        //        return res;
-        //    }
-        //    else
-        //    {
-        //        try
-        //        {
-        //            string uploadUrl = this.uploadResponse.GetChild("media").GetAttribute("url");
-        //            this.uploadResponse = null;
+            //request upload
+            UploadResponse response = await this.UploadFile(filehash, "audio", audioData.Length, audioData, to, type, extension);
 
-        //            Uri uri = new Uri(uploadUrl);
+            if (response != null && !String.IsNullOrEmpty(response.url))
+            {
+                //send message
+                FMessage msg = new FMessage(to, true)
+                {
+                    media_wa_type = FMessage.Type.Audio,
+                    media_mime_type = response.mimetype,
+                    media_name = response.url.Split('/').Last(),
+                    media_size = response.size,
+                    media_url = response.url,
+                    media_duration_seconds = response.duration
+                };
+                return msg;
+            }
+            return null;
+        }
 
-        //            string hashname = string.Empty;
-        //            byte[] buff = MD5.Create().ComputeHash(System.Text.Encoding.Default.GetBytes(b64hash));
-        //            StringBuilder sb = new StringBuilder();
-        //            foreach (byte b in buff)
-        //            {
-        //                sb.Append(b.ToString("X2"));
-        //            }
-        //            hashname = String.Format("{0}.{1}", sb.ToString(), extension);
+        protected async Task<UploadResponse> UploadFile(string b64hash, string type, long size, byte[] fileData, string to, string contenttype, string extension)
+        {
+            ProtocolTreeNode media = new ProtocolTreeNode("media", new KeyValue[] {
+                new KeyValue("hash", b64hash),
+                new KeyValue("type", type),
+                new KeyValue("size", size.ToString())
+            });
+            string id = TicketManager.GenerateId();
+            ProtocolTreeNode node = new ProtocolTreeNode("iq", new KeyValue[] {
+                new KeyValue("id", id),
+                new KeyValue("to", Constants.Information.WhatsAppServer),
+                new KeyValue("type", "set"),
+                new KeyValue("xmlns", "w:m")
+            }, media);
+            this.uploadResponse = null;
+            this.SendNode(node);
+            int i = 0;
 
-        //            string boundary = "zzXXzzYYzzXXzzQQ";
+            IAsyncOperation<bool> taskLoad = this.pollMessage().AsAsyncOperation<bool>();
+            taskLoad.AsTask().Wait();
+            var ress = taskLoad.GetResults();
 
-        //            sb = new StringBuilder();
+            if (this.uploadResponse != null && this.uploadResponse.GetChild("duplicate") != null)
+            {
+                UploadResponse res = new UploadResponse(this.uploadResponse);
+                this.uploadResponse = null;
+                return res;
+            }
+            else
+            {
+                try
+                {
+                    if (this.uploadResponse == null) return null;
+                    string uploadUrl = this.uploadResponse.GetChild("media").GetAttribute("url");
+                    this.uploadResponse = null;
 
-        //            sb.AppendFormat("--{0}\r\n", boundary);
-        //            sb.Append("Content-Disposition: form-data; name=\"to\"\r\n\r\n");
-        //            sb.AppendFormat("{0}\r\n", to);
-        //            sb.AppendFormat("--{0}\r\n", boundary);
-        //            sb.Append("Content-Disposition: form-data; name=\"from\"\r\n\r\n");
-        //            sb.AppendFormat("{0}\r\n", this.phoneNumber);
-        //            sb.AppendFormat("--{0}\r\n", boundary);
-        //            sb.AppendFormat("Content-Disposition: form-data; name=\"file\"; filename=\"{0}\"\r\n", hashname);
-        //            sb.AppendFormat("Content-Type: {0}\r\n\r\n", contenttype);
-        //            string header = sb.ToString();
+                    Uri uri = new Uri(uploadUrl);
 
-        //            sb = new StringBuilder();
-        //            sb.AppendFormat("\r\n--{0}--\r\n", boundary);
-        //            string footer = sb.ToString();
+                    string hashname = string.Empty;
+                    byte[] buff = System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetBytes(MD5.Encrypt(System.Text.Encoding.GetEncoding(Constants.Information.ASCIIEncoding).GetBytes(b64hash)));
+                    StringBuilder sb = new StringBuilder();
+                    foreach (byte b in buff)
+                    {
+                        sb.Append(b.ToString("X2"));
+                    }
+                    hashname = String.Format("{0}.{1}", sb.ToString(), extension);
 
-        //            long clength = size + header.Length + footer.Length;
+                    string boundary = "zzXXzzYYzzXXzzQQ";
 
-        //            sb = new StringBuilder();
-        //            sb.AppendFormat("POST {0}\r\n", uploadUrl);
-        //            sb.AppendFormat("Content-Type: multipart/form-data; boundary={0}\r\n", boundary);
-        //            sb.AppendFormat("Host: {0}\r\n", uri.Host);
-        //            sb.AppendFormat("User-Agent: {0}\r\n", WhatsConstants.UserAgent);
-        //            sb.AppendFormat("Content-Length: {0}\r\n\r\n", clength);
-        //            string post = sb.ToString();
+                    sb = new StringBuilder();
 
-        //            TcpClient tc = new TcpClient(uri.Host, 443);
-        //            SslStream ssl = new SslStream(tc.GetStream());
-        //            try
-        //            {
-        //                ssl.AuthenticateAsClient(uri.Host);
-        //            }
-        //            catch (Exception e)
-        //            {
-        //                throw e;
-        //            }
+                    sb.AppendFormat("--{0}\r\n", boundary);
+                    sb.Append("Content-Disposition: form-data; name=\"to\"\r\n\r\n");
+                    sb.AppendFormat("{0}\r\n", to);
+                    sb.AppendFormat("--{0}\r\n", boundary);
+                    sb.Append("Content-Disposition: form-data; name=\"from\"\r\n\r\n");
+                    sb.AppendFormat("{0}\r\n", this.phoneNumber);
+                    sb.AppendFormat("--{0}\r\n", boundary);
+                    sb.AppendFormat("Content-Disposition: form-data; name=\"file\"; filename=\"{0}\"\r\n", hashname);
+                    sb.AppendFormat("Content-Type: {0}\r\n\r\n", contenttype);
+                    string header = sb.ToString();
 
-        //            List<byte> buf = new List<byte>();
-        //            buf.AddRange(Encoding.UTF8.GetBytes(post));
-        //            buf.AddRange(Encoding.UTF8.GetBytes(header));
-        //            buf.AddRange(fileData);
-        //            buf.AddRange(Encoding.UTF8.GetBytes(footer));
+                    sb = new StringBuilder();
+                    sb.AppendFormat("\r\n--{0}--\r\n", boundary);
+                    string footer = sb.ToString();
 
-        //            ssl.Write(buf.ToArray(), 0, buf.ToArray().Length);
+                    long clength = size + header.Length + footer.Length;
 
-        //            //moment of truth...
-        //            buff = new byte[1024];
-        //            ssl.Read(buff, 0, 1024);
+                    //sb = new StringBuilder();
+                    //sb.AppendFormat("POST {0}\r\n", uploadUrl);
+                    //sb.AppendFormat("Content-Type: multipart/form-data; boundary={0}\r\n", boundary);
+                    //sb.AppendFormat("Host: {0}\r\n", uri.Host);
+                    //sb.AppendFormat("User-Agent: {0}\r\n", Constants.Information.UserAgent);
+                    //sb.AppendFormat("Content-Length: {0}\r\n\r\n", clength);
+                    string post = sb.ToString();
+                    Dictionary<string, string> headers = new Dictionary<string, string>();
+                    headers.Add("User-Agent", Constants.Information.UserAgent);
+                    headers.Add("Content-Length", clength.ToString());
 
-        //            string result = Encoding.UTF8.GetString(buff);
-        //            foreach (string line in result.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries))
-        //            {
-        //                if (line.StartsWith("{"))
-        //                {
-        //                    string fooo = line.TrimEnd(new char[] { (char)0 });
-        //                    JavaScriptSerializer jss = new JavaScriptSerializer();
-        //                    WaUploadResponse resp = jss.Deserialize<WaUploadResponse>(fooo);
-        //                    if (!String.IsNullOrEmpty(resp.url))
-        //                    {
-        //                        return resp;
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        catch (Exception)
-        //        { }
-        //    }
-        //    return null;
-        //}
+                    List<byte> buf = new List<byte>();
+                    //buf.AddRange(Encoding.UTF8.GetBytes(post));
+                    buf.AddRange(Encoding.UTF8.GetBytes(header));
+                    buf.AddRange(fileData);
+                    buf.AddRange(Encoding.UTF8.GetBytes(footer));
+
+                    var response = await HttpRequest.UploadPhotoContinueAsync(buf.ToArray(), uploadUrl, boundary, headers);
+                    buff = await response.Content.ReadAsByteArrayAsync();
+                    string result = Encoding.UTF8.GetString(buff, 0, buff.Length);
+                    foreach (string line in result.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        if (line.StartsWith("{"))
+                        {
+                            string fooo = line.TrimEnd(new char[] { (char)0 });
+                            UploadResponse resp = JsonConvert.DeserializeObject<UploadResponse>(fooo);
+                            if (!String.IsNullOrEmpty(resp.url))
+                            {
+                                return resp;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    WhatsAPI.UniversalApps.Libs.Utils.Logger.Log.Write("Error when upload media : " + ex.Message);
+                }
+            }
+            return null;
+        }
         #endregion
     }
 }

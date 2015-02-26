@@ -132,7 +132,7 @@ namespace WhatsAPI.UniversalApps.Sample.Helpers
             {
                 result.Add(item);
             }
-            return result;
+            return new ObservableCollection<Contacts>(result.OrderBy(x => x.name.ToLower())) ;
         }
     }
 }

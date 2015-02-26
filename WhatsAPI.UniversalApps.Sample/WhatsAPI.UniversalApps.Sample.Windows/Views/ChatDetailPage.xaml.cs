@@ -5,10 +5,15 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using WhatsAPI.UniversalApps.Libs.Constants;
 using WhatsAPI.UniversalApps.Libs.Models;
+using WhatsAPI.UniversalApps.Libs.Utils.Common;
 using WhatsAPI.UniversalApps.Sample.Models;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.Storage.FileProperties;
+using Windows.Storage.Pickers;
 using Windows.System;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -96,7 +101,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
                     contacts.jid = contacts.phoneNumber + "@" + Information.WhatsAppServer;
                     server = WhatsAPI.UniversalApps.Libs.Constants.Information.WhatsAppServer;
                     isGroup = false;
-                    
+
                 }
                 User user = new User(contacts.jid, server, contacts.name);
                 this.user = user;
@@ -150,7 +155,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
             {
                 this.isTyping = true;
                 SocketInstance.Instance.SendComposing(this.user.GetFullJid());
-                this.timerTyping.Interval = new TimeSpan(0,0,5);
+                this.timerTyping.Interval = new TimeSpan(0, 0, 5);
                 this.timerTyping.Start();
             }
         }
@@ -175,6 +180,87 @@ namespace WhatsAPI.UniversalApps.Sample.Views
                 SocketInstance.Instance.SendMessage(this.user.GetFullJid(), txtChat.Text);
                 this.AddNewText(App.UserName, txtChat.Text);
                 txtChat.Text = "";
+            }
+        }
+        private Rect GetElementRect(FrameworkElement element)
+        {
+            GeneralTransform buttonTransform = element.TransformToVisual(null);
+            Point point = buttonTransform.TransformPoint(new Point());
+            return new Rect(point, new Size(element.ActualWidth, element.ActualHeight));
+        }
+        private async void btnAttachImage_Click(object sender, RoutedEventArgs e)
+        {
+            var menu = new PopupMenu();
+            menu.Commands.Add(new UICommand("Image", null, 1));
+            menu.Commands.Add(new UICommand("Camera", null, 2));
+            menu.Commands.Add(new UICommand("Video", null, 3));
+            try
+            {
+                var chosenCommand = await menu.ShowForSelectionAsync(GetElementRect((FrameworkElement)sender));
+                if (chosenCommand != null)
+                {
+                    switch ((int)chosenCommand.Id)
+                    {
+                        case 1:
+                            {
+                                FileOpenPicker pk = new FileOpenPicker();
+                                pk.ViewMode = PickerViewMode.Thumbnail;
+                                pk.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+                                pk.FileTypeFilter.Add(".jpg");
+                                pk.FileTypeFilter.Add(".jpeg");
+
+                                StorageFile file = await pk.PickSingleFileAsync();
+                                if (file != null)
+                                {
+                                    var byteFile = await FileHelper.ConvertStorageFileToByteArray(file);
+                                    SocketInstance.Instance.SendMessageImage(this.user.GetFullJid(), byteFile, Enums.ImageType.JPEG);
+                                }
+                            }
+                            break;
+
+                        case 2:
+                            {
+                                //CameraCaptureUI dialog = new CameraCaptureUI();
+                                //dialog.PhotoSettings.MaxResolution = CameraCaptureUIMaxPhotoResolution.MediumXga;
+
+                                //StorageFile file = await dialog.CaptureFileAsync(CameraCaptureUIMode.Photo);
+                                //if (file != null)
+                                //{
+                                //    await _viewModel.AttachPhoto(file);
+                                //}
+                            }
+                            break;
+
+                        case 3:
+                            {
+                                //FileOpenPicker pk = new FileOpenPicker();
+                                //pk.ViewMode = PickerViewMode.Thumbnail;
+                                //pk.SuggestedStartLocation = PickerLocationId.VideosLibrary;
+                                //pk.FileTypeFilter.Add(".mp4");
+                                //pk.FileTypeFilter.Add(".3gp");
+
+                                //StorageFile file = await pk.PickSingleFileAsync();
+                                //if (file != null)
+                                //{
+                                //    BasicProperties properties = await file.GetBasicPropertiesAsync();
+                                //    if (properties.Size > 1024 * 1024 * 10)
+                                //    {
+                                       
+                                //        return;
+                                //    }
+
+                                   
+                                //}
+                            }
+                            break;
+
+                       
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
             }
         }
 
