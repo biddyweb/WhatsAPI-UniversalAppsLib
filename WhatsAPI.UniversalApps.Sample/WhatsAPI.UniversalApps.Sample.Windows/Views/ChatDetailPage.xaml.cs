@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using WhatsAPI.UniversalApps.Libs.Constants;
 using WhatsAPI.UniversalApps.Libs.Models;
 using WhatsAPI.UniversalApps.Libs.Utils.Common;
+using WhatsAPI.UniversalApps.Sample.Helpers;
 using WhatsAPI.UniversalApps.Sample.Models;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -106,7 +107,14 @@ namespace WhatsAPI.UniversalApps.Sample.Views
                 User user = new User(contacts.jid, server, contacts.name);
                 this.user = user;
                 if (!isGroup)
+                {
                     processChat();
+                    if (contacts.profileImage == null)
+                    {
+                        ContactHelper.SyncProfileContactImage(contacts.jid);
+                        ChattingPage.DefaultViewModel.UpdateImage();
+                    }
+                }
                 this.isTyping = false;
             }
             base.OnNavigatedTo(e);
@@ -212,7 +220,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
                                 StorageFile file = await pk.PickSingleFileAsync();
                                 if (file != null)
                                 {
-                                    var byteFile = await FileHelper.ConvertStorageFileToByteArray(file);
+                                    var byteFile = await WhatsAPI.UniversalApps.Libs.Utils.Common.FileHelper.ConvertStorageFileToByteArray(file);
                                     this.AddNewImage(App.UserName, file.Path);
                                     SocketInstance.Instance.SendMessageImage(this.user.GetFullJid(), byteFile, Enums.ImageType.JPEG);
                                 }
@@ -252,7 +260,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
                                         return;
                                     }
                                      
-                                    var byteFile = await FileHelper.ConvertStorageFileToByteArray(file);
+                                    var byteFile = await WhatsAPI.UniversalApps.Libs.Utils.Common.FileHelper.ConvertStorageFileToByteArray(file);
                                     SocketInstance.Instance.SendMessageVideo(this.user.GetFullJid(), byteFile, Enums.VideoType.MP4);
                                 }
                             }

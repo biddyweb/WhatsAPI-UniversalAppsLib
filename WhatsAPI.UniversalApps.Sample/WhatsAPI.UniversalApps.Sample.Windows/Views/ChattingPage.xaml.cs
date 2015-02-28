@@ -32,14 +32,14 @@ namespace WhatsAPI.UniversalApps.Sample.Views
     public sealed partial class ChattingPage : Page
     {
         private NavigationHelper navigationHelper;
-        private ChatPageViewModel defaultViewModel = new ChatPageViewModel();
+        private static ChatPageViewModel defaultViewModel = new ChatPageViewModel();
 
         /// <summary>
         /// This can be changed to a strongly typed view model.
         /// </summary>
-        public ChatPageViewModel DefaultViewModel
+        public static ChatPageViewModel DefaultViewModel
         {
-            get { return this.defaultViewModel; }
+            get { return defaultViewModel; }
         }
         /// <summary>
         /// NavigationHelper is used on each page to aid in navigation and 
@@ -81,6 +81,8 @@ namespace WhatsAPI.UniversalApps.Sample.Views
                         this.ChatPage.Navigate(typeof(ChatDetailPage), contacts);
                 });
         }
+
+
 
 
 
