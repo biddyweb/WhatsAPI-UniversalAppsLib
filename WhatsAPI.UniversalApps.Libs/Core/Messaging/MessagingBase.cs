@@ -237,13 +237,31 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                     newHeight = 100;
                 }
 
+                var sourceStream = await file.OpenAsync(FileAccessMode.Read);
                 var cropImage = await ImageHelper.ResizeImage(file, (uint)newHeight, (uint)newWidth);
-                await FileHelper.SaveFileFromByteArray(cropImage,"tempPhotoProfile.jpg");
-                return cropImage;    
+                var res = await FileHelper.ConvertStorageFileToByteArray(cropImage);
+                return res;    
             }
             return null;
         }
 
+        protected async Task<byte[]> CreateVideoThumbnail(byte[] videoData)
+        {
+            var file = await FileHelper.SaveFileFromByteArray(videoData,"temp.mp4");
+            if (file != null)
+            {
+               var imageFile = await file.GetThumbnailAsync(Windows.Storage.FileProperties.ThumbnailMode.VideosView,100,Windows.Storage.FileProperties.ThumbnailOptions.UseCurrentScale);
+               var destinationFile = await FileHelper.CreateLocalFile("thumbVideo.jpg", "Cache");
+               Windows.Storage.Streams.Buffer MyBuffer = new Windows.Storage.Streams.Buffer(Convert.ToUInt32(imageFile.Size));
+               IBuffer iBuf = await imageFile.ReadAsync(MyBuffer, MyBuffer.Capacity, InputStreamOptions.None);
+               using (var strm = await destinationFile.OpenAsync(FileAccessMode.ReadWrite))
+               {
+                   await strm.WriteAsync(iBuf);
+               }
+               return await FileHelper.ConvertStorageFileToByteArray(destinationFile);
+            }
+            return null;
+        }
         protected static DateTime GetDateTimeFromTimestamp(string timestamp)
         {
             long data = 0;
@@ -291,8 +309,8 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                 }
 
                 var cropImage = await ImageHelper.ResizeImage(file, (uint)newHeight, (uint)newWidth);
-                await FileHelper.SaveFileFromByteArray(cropImage);
-                return cropImage;    
+
+                return await FileHelper.ConvertStorageFileToByteArray(cropImage);    
             }
             return bytes;
         }

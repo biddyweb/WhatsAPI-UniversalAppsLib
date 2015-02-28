@@ -808,12 +808,14 @@ namespace WhatsAPI.UniversalApps.Libs
                     media_name = response.url.Split('/').Last(),
                     media_size = response.size,
                     media_url = response.url,
-                    media_duration_seconds = response.duration
+                    media_duration_seconds = response.duration,
+                    binary_data = await this.CreateVideoThumbnail(videoData)
                 };
                 return msg;
             }
             return null;
         }
+
 
         public async Task SendMessageAudio(string to, byte[] audioData, WhatsAPI.UniversalApps.Libs.Constants.Enums.AudioType audtype)
         {
@@ -892,8 +894,14 @@ namespace WhatsAPI.UniversalApps.Libs
             int i = 0;
 
             IAsyncOperation<bool> taskLoad = this.pollMessage().AsAsyncOperation<bool>();
-            taskLoad.AsTask().Wait();
-            var ress = taskLoad.GetResults();
+            taskLoad.AsTask().Wait(5000);
+            
+            if (this.uploadResponse == null)
+            {
+                IAsyncOperation<bool> taskLoad2 = this.pollMessage().AsAsyncOperation<bool>();
+                taskLoad.AsTask().Wait(5000);
+              
+            }
 
             if (this.uploadResponse != null && this.uploadResponse.GetChild("duplicate") != null)
             {
@@ -941,13 +949,6 @@ namespace WhatsAPI.UniversalApps.Libs
 
                     long clength = size + header.Length + footer.Length;
 
-                    //sb = new StringBuilder();
-                    //sb.AppendFormat("POST {0}\r\n", uploadUrl);
-                    //sb.AppendFormat("Content-Type: multipart/form-data; boundary={0}\r\n", boundary);
-                    //sb.AppendFormat("Host: {0}\r\n", uri.Host);
-                    //sb.AppendFormat("User-Agent: {0}\r\n", Constants.Information.UserAgent);
-                    //sb.AppendFormat("Content-Length: {0}\r\n\r\n", clength);
-                    string post = sb.ToString();
                     Dictionary<string, string> headers = new Dictionary<string, string>();
                     headers.Add("User-Agent", Constants.Information.UserAgent);
                     headers.Add("Content-Length", clength.ToString());

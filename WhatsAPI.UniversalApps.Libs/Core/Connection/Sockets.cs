@@ -101,6 +101,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                 }
                 catch (Exception ex)
                 {
+                  
                     throw new ConnectionException("Cannot connect");
                 }
             });
@@ -282,7 +283,14 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                                    }
                                    catch (Exception ex)
                                    {
-                                       throw new ConnectionException("Connection Lost");
+                                       if (ex.Message.Contains("The operation identifier is not valid."))
+                                       {
+                                           throw ex;
+                                       }
+                                       else
+                                       {
+                                           throw new ConnectionException("Connection Lost");
+                                       }
                                    }
                                });
 

@@ -87,7 +87,6 @@
     <Compile Include="Models\TokenMap.cs" />
     <Compile Include="Models\UploadResponse.cs" />
     <Compile Include="Models\User.cs" />
-    <Compile Include="SHa256.cs" />
     <Compile Include="Utils\Common\BinTreeNodeWriter.cs" />
     <Compile Include="Utils\Common\BinTreeNodeReader.cs" />
     <Compile Include="Utils\Common\FileHelper.cs" />

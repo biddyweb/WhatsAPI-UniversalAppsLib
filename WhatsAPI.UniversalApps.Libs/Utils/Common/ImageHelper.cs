@@ -32,7 +32,7 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             }
         }
 
-        public static async Task<byte[]> ResizeImage(StorageFile BigFile, uint finalHeight, uint finalWidth)
+        public static async Task<StorageFile> ResizeImage(StorageFile BigFile, uint finalHeight, uint finalWidth)
         {
             using (var sourceStream = await BigFile.OpenAsync(FileAccessMode.Read))
             {
@@ -44,13 +44,34 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
                     transform,
                     ExifOrientationMode.RespectExifOrientation,
                     ColorManagementMode.DoNotColorManage);
-
+           
+               
                 byte[] buffer = pixelData.DetachPixelData();
-                return buffer;
+               
+                StorageFile file = await FileHelper.CreateLocalFile("newThumb.jpg", "Cache", true);
+                IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite);
+                BitmapEncoder be = await BitmapEncoder.CreateForTranscodingAsync(stream, decoder);
+                be.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Straight, finalWidth, finalHeight, 96.0, 96.0, buffer);
+                try
+                {
+                    await be.FlushAsync();
+                }
+                catch (Exception ex)
+                {
+                    string s = ex.ToString();
+                }
+
+                await stream.FlushAsync();
+                stream.Dispose();
+
+           
+
+                return file;
+            
             }
         }
 
-        public static async Task<StorageFile> CropImage(IRandomAccessStream fs, BitmapImage image, int newWidth, int newHeight)
+        public static async Task<StorageFile> CropImage(IRandomAccessStream fs,  int newWidth, int newHeight)
         {
             BitmapDecoder decoder = await BitmapDecoder.CreateAsync(fs);
 
@@ -60,17 +81,25 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             BitmapEncoder enc = await BitmapEncoder.CreateForTranscodingAsync(stream, decoder);
             enc.BitmapTransform.ScaledWidth = (uint)newWidth;
             enc.BitmapTransform.ScaledHeight = (uint)newHeight;
-
-            enc.BitmapTransform.ScaledHeight = 100;
-            enc.BitmapTransform.ScaledWidth = 100;
-
-
-            BitmapBounds bounds = new BitmapBounds();
-            bounds.Height = 50;
-            bounds.Width = 50;
-            bounds.X = 50;
-            bounds.Y = 50;
-            enc.BitmapTransform.Bounds = bounds;
+            var MaxImageWidth = 100;
+            var MaxImageHeight = 100;
+            if (newWidth > MaxImageWidth || newHeight > MaxImageHeight)
+            {
+                BitmapBounds bounds = new BitmapBounds();
+                if (newWidth > MaxImageWidth)
+                {
+                    bounds.Width = (uint)MaxImageWidth;
+                    bounds.X =(uint) (newWidth - MaxImageWidth) / 2;
+                }
+                else bounds.Width = (uint)newWidth;
+                if (newHeight > MaxImageHeight)
+                {
+                    bounds.Height =(uint) MaxImageHeight;
+                    bounds.Y = (uint)(newHeight - MaxImageHeight) / 2;
+                }
+                else bounds.Height = (uint)newHeight;
+                enc.BitmapTransform.Bounds = bounds;
+            }
 
             try
             {

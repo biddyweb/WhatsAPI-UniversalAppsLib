@@ -70,24 +70,25 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
 
             return contentBytes;
         }
-        public static async Task<HttpResponseMessage> UploadPhotoContinueAsync(byte[] files, string url, string boundary, Dictionary<string, string> headers = null, string fileName = "default.jpg")
+        public static async Task<HttpResponseMessage> UploadPhotoContinueAsync(byte[] files, string url, string boundary, Dictionary<string, string> headers = null, long length = 0, string fileName = "default.jpg")
         {
 
             HttpRequestMessage request = new HttpRequestMessage(
            System.Net.Http.HttpMethod.Post,
            new Uri(url));
-            
+
             request.Content = new ByteArrayContent(
             files);
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("multipart/form-data");
             request.Content.Headers.ContentType.Parameters.Add(new NameValueHeaderValue(
      "boundary",
      boundary));
+            HttpClient client = new HttpClient();
             foreach (var header in headers)
             {
-                request.Content.Headers.Add(header.Key, header.Value.ToString());
+                client.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
             }
-            HttpClient client = new HttpClient();
+            Logger.Log.Write(request.ToString(), url);
             var attachmentResponse = await client.SendAsync(request);
 
             return attachmentResponse;
