@@ -213,6 +213,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
                                 if (file != null)
                                 {
                                     var byteFile = await FileHelper.ConvertStorageFileToByteArray(file);
+                                    this.AddNewImage(App.UserName, file.Path);
                                     SocketInstance.Instance.SendMessageImage(this.user.GetFullJid(), byteFile, Enums.ImageType.JPEG);
                                 }
                             }
@@ -233,24 +234,27 @@ namespace WhatsAPI.UniversalApps.Sample.Views
 
                         case 3:
                             {
-                                //FileOpenPicker pk = new FileOpenPicker();
-                                //pk.ViewMode = PickerViewMode.Thumbnail;
-                                //pk.SuggestedStartLocation = PickerLocationId.VideosLibrary;
-                                //pk.FileTypeFilter.Add(".mp4");
-                                //pk.FileTypeFilter.Add(".3gp");
+                                FileOpenPicker pk = new FileOpenPicker();
+                                pk.ViewMode = PickerViewMode.Thumbnail;
+                                pk.SuggestedStartLocation = PickerLocationId.VideosLibrary;
+                                pk.FileTypeFilter.Add(".mp4");
+                                pk.FileTypeFilter.Add(".avi");
+                                pk.FileTypeFilter.Add(".mov");
 
-                                //StorageFile file = await pk.PickSingleFileAsync();
-                                //if (file != null)
-                                //{
-                                //    BasicProperties properties = await file.GetBasicPropertiesAsync();
-                                //    if (properties.Size > 1024 * 1024 * 10)
-                                //    {
-                                       
-                                //        return;
-                                //    }
-
-                                   
-                                //}
+                                StorageFile file = await pk.PickSingleFileAsync();
+                                if (file != null)
+                                {
+                                    BasicProperties properties = await file.GetBasicPropertiesAsync();
+                                    if (properties.Size > 1024 * 1024 * 10)
+                                    {
+                                        MessageDialog dialog = new MessageDialog("Too big");
+                                        await dialog.ShowAsync();
+                                        return;
+                                    }
+                                     
+                                    var byteFile = await FileHelper.ConvertStorageFileToByteArray(file);
+                                    SocketInstance.Instance.SendMessageVideo(this.user.GetFullJid(), byteFile, Enums.VideoType.MP4);
+                                }
                             }
                             break;
 

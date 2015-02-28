@@ -42,9 +42,9 @@ namespace WhatsAPI.UniversalApps.Sample.Views
             else
             {
 #if !WINDOWS_PHONE_APP
-                MessageDialog dialog = new MessageDialog("Registration Success : " + Register.Password, "Registration Success");
+                MessageDialog dialog = new MessageDialog("Registration Success", "Registration Success");
                 await dialog.ShowAsync();
-                if (Register.Response.GetJsonValue("type") != null && Register.Response.GetJsonValue("type") == "new")
+                if ((Register.Response.GetJsonValue("type") != null && Register.Response.GetJsonValue("type") == "new")||   String.IsNullOrEmpty(Register.Password))
                 {
                     if (this.Frame != null)
                     {

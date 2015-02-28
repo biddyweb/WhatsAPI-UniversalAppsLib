@@ -15,6 +15,7 @@ using Google.Apis.Http;
 using Google.Apis.Contacts.v3;
 using Google.Apis.Contacts.v3.Data;
 using System.Collections.ObjectModel;
+using Google.Apis.Oauth2.v2;
 
 namespace WhatsAPI.UniversalApps.Sample.Helpers
 {
@@ -26,7 +27,7 @@ namespace WhatsAPI.UniversalApps.Sample.Helpers
         {
             var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
     new Uri("ms-appx:///Assets/client_secrets.json"),
-    new[] { ContactsService.Scope.FullContacts },
+    new[] { ContactsService.Scope.FullContacts,Oauth2Service.Scope.UserinfoProfile,Oauth2Service.Scope.UserinfoEmail },
     "user",
     CancellationToken.None);
 
@@ -36,11 +37,18 @@ namespace WhatsAPI.UniversalApps.Sample.Helpers
                 ApplicationName = "WhassApp Windows 8",
                 HttpClientInitializer = credential
             });
+            var oauthSerivce = new Oauth2Service(new BaseClientService.Initializer()
+            {
+
+                ApplicationName = "WhassApp Windows 8",
+                HttpClientInitializer = credential
+            });
+            var userInfo = await oauthSerivce.Userinfo.Get().ExecuteAsync();
             List<string> numberList = new List<string>();
             try
             {
                 PhoneNumbers.PhoneNumberUtil util = PhoneNumbers.PhoneNumberUtil.GetInstance();
-                ContactList response = await services.Contact.Get(credential.UserId).ExecuteAsync();
+                ContactList response = await services.Contact.Get(userInfo.Email).ExecuteAsync();
                 foreach (var c in response.Feed.Entries)
                 {
                     if (c.PhoneNumbers != null)
