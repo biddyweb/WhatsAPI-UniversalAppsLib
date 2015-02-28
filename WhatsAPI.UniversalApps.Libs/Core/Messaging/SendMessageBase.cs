@@ -13,12 +13,15 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
 {
     public class SendMessageBase : MessagingBase
     {
-
+        private bool isTryingLogin = false;
         public async Task Login(byte[] nextChallenge = null)
         {
             //reset stuff
             await Task.Run(async () =>
                               {
+                                  if (isTryingLogin)
+                                      return;
+                                  isTryingLogin = true;
                                   this.reader.Key = null;
                                   this.BinWriter.Key = null;
                                   this._challengeBytes = null;
@@ -60,7 +63,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                                       //trying++;
                                       //await Task.Delay(10);
                                   }
-
+                                  isTryingLogin = false;
                                   this.SendAvailableForChat(this.name, this.hidden);
                               });
         }
@@ -417,6 +420,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
         {
             if (node.GetAttribute("type") == "error")
             {
+                
                 this.fireOnError(node.GetAttribute("id"), node.GetAttribute("from"), Int32.Parse(node.GetChild("error").GetAttribute("code")), node.GetChild("error").GetAttribute("text"));
             }
             if (node.GetChild("sync") != null)

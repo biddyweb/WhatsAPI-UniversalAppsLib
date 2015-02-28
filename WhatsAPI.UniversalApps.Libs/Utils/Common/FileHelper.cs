@@ -231,6 +231,11 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
                 await file.DeleteAsync();
         }
 
+        public static string RemoveSpaceFromFileName(string name)
+        {
+            return name.Replace(" ", "").Trim();
+        }
+
         public static async Task<byte[]> ConvertStorageFileToByteArray(StorageFile file)
         {
             byte[] fileBytes = null;

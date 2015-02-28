@@ -11,6 +11,11 @@ using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace WhatsAPI.UniversalApps.Libs.Utils.Common
 {
+    public enum ResizeType
+    {
+        PROFILE,
+        THUMBNAIL
+    }
     public static class ImageHelper
     {
         public static void GetPhotoSizeByRatio(int width, int height, ref int newWidth, ref int newHeight)
@@ -32,7 +37,7 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
             }
         }
 
-        public static async Task<StorageFile> ResizeImage(StorageFile BigFile, uint finalHeight, uint finalWidth)
+        public static async Task<StorageFile> ResizeImage(StorageFile BigFile, uint finalHeight, uint finalWidth,string fileName = "")
         {
             using (var sourceStream = await BigFile.OpenAsync(FileAccessMode.Read))
             {
@@ -48,7 +53,7 @@ namespace WhatsAPI.UniversalApps.Libs.Utils.Common
                
                 byte[] buffer = pixelData.DetachPixelData();
                
-                StorageFile file = await FileHelper.CreateLocalFile("newThumb.jpg", "Cache", true);
+                StorageFile file = await FileHelper.CreateLocalFile(fileName, "Cache", true);
                 IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.ReadWrite);
                 BitmapEncoder be = await BitmapEncoder.CreateForTranscodingAsync(stream, decoder);
                 be.SetPixelData(BitmapPixelFormat.Rgba8, BitmapAlphaMode.Straight, finalWidth, finalHeight, 96.0, 96.0, buffer);

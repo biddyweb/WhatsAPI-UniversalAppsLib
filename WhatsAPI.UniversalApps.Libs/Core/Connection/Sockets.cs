@@ -73,7 +73,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
             this.whatsPort = Constants.Information.WhatsPort;
             this.incomplete_message = new List<byte>();
         }
-
+        private bool isTryingtoConnect = false;
         /// <summary>
         /// Connect to the whatsapp server
         /// </summary>
@@ -84,7 +84,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                 try
                 {
 
-
+                    isTryingtoConnect = true;
                     this.socket = new StreamSocket();
                     this.socket.Control.KeepAlive = true;
                     _writePacket = new DataWriter(this.socket.OutputStream);
@@ -97,11 +97,12 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                     //HandleConnect();
                     _transferredSize = 0;
                     IsConnected = true;
+                    isTryingtoConnect = false;
 
                 }
                 catch (Exception ex)
                 {
-                  
+                    isTryingtoConnect = false;
                     throw new ConnectionException("Cannot connect");
                 }
             });

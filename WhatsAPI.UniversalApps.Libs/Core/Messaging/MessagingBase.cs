@@ -76,17 +76,23 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
             this.whatsNetwork = new Sockets(Constants.Information.WhatsAppHost, Constants.Information.WhatsPort, this.timeout);
         }
 
+        private bool isTryingToConnect = false;
         public async Task Connect()
         {
             try
             {
+                if (isTryingToConnect)
+                    return;
+                isTryingToConnect = true;
                 await this.whatsNetwork.Connect();
                 this.loginStatus = WhatsAPI.UniversalApps.Libs.Constants.Enums.CONNECTION_STATUS.CONNECTED;
                 //success
+                isTryingToConnect = false;
                 this.fireOnConnectSuccess();
             }
             catch (Exception e)
             {
+                isTryingToConnect = false;
                 this.fireOnConnectFailed(e);
             }
         }
@@ -215,7 +221,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
             }
         }
 
-        protected async Task< byte[]> CreateThumbnail(byte[] imageData)
+        protected async Task< byte[]> CreateThumbnail(byte[] imageData,string fileName = "")
         {
             BitmapImage image = null;
             image = await ImageHelper.ByteArrayToImageAsync(imageData);
@@ -238,14 +244,14 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Messaging
                 }
 
                 var sourceStream = await file.OpenAsync(FileAccessMode.Read);
-                var cropImage = await ImageHelper.ResizeImage(file, (uint)newHeight, (uint)newWidth);
+                var cropImage = await ImageHelper.ResizeImage(file, (uint)newHeight, (uint)newWidth,fileName);
                 var res = await FileHelper.ConvertStorageFileToByteArray(cropImage);
                 return res;    
             }
             return null;
         }
 
-        protected async Task<byte[]> CreateVideoThumbnail(byte[] videoData)
+        protected async Task<byte[]> CreateVideoThumbnail(byte[] videoData,string fileName = "")
         {
             var file = await FileHelper.SaveFileFromByteArray(videoData,"temp.mp4");
             if (file != null)

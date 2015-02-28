@@ -751,7 +751,7 @@ namespace WhatsAPI.UniversalApps.Libs
                     media_name = response.url.Split('/').Last(),
                     media_size = response.size,
                     media_url = response.url,
-                    binary_data = await this.CreateThumbnail(ImageData)
+                    binary_data = await this.CreateThumbnail(ImageData, "thumb-"+response.url.Split('/').Last())
                 };
                 return msg;
             }
@@ -809,13 +809,22 @@ namespace WhatsAPI.UniversalApps.Libs
                     media_size = response.size,
                     media_url = response.url,
                     media_duration_seconds = response.duration,
-                    binary_data = await this.CreateVideoThumbnail(videoData)
+                    binary_data = await this.CreateVideoThumbnail(videoData, "thumb-"+response.url.Split('/').Last().Replace(getExtension(response.url.Split('/').Last()),"jpg"))
                 };
                 return msg;
             }
             return null;
         }
 
+        private string getExtension(string fileName)
+        {
+            var nameExt = fileName.Split('.');
+            if (nameExt.Count() == 2)
+            {
+                return nameExt[1];
+            }
+            return nameExt[0];
+        }
 
         public async Task SendMessageAudio(string to, byte[] audioData, WhatsAPI.UniversalApps.Libs.Constants.Enums.AudioType audtype)
         {
