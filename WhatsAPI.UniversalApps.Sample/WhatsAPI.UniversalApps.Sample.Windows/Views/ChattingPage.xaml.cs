@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using WhatsAPI.UniversalApps.Sample.ViewModels;
 using WhatsAPI.UniversalApps.Sample.Models;
+using WhatsAPI.UniversalApps.Sample.Helpers;
 
 // The Split Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234234
 
@@ -31,14 +32,14 @@ namespace WhatsAPI.UniversalApps.Sample.Views
     public sealed partial class ChattingPage : Page
     {
         private NavigationHelper navigationHelper;
-        private ChatPageViewModel defaultViewModel = new ChatPageViewModel();
+        private static ChatPageViewModel defaultViewModel = new ChatPageViewModel();
 
         /// <summary>
         /// This can be changed to a strongly typed view model.
         /// </summary>
-        public ChatPageViewModel DefaultViewModel
+        public static ChatPageViewModel DefaultViewModel
         {
-            get { return this.defaultViewModel; }
+            get { return defaultViewModel; }
         }
         /// <summary>
         /// NavigationHelper is used on each page to aid in navigation and 
@@ -48,7 +49,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
         {
             get { return this.navigationHelper; }
         }
-        
+
         public ChattingPage()
         {
             this.InitializeComponent();
@@ -66,11 +67,24 @@ namespace WhatsAPI.UniversalApps.Sample.Views
             // Start listening for Window size changes 
             // to change from showing two panes to showing a single pane
             Window.Current.SizeChanged += Window_SizeChanged;
-           
+
             this.InvalidateVisualState();
         }
 
-       
+        async void Instance_OnGetMessage(Libs.Base.ProtocolTreeNode messageNode, string from, string id, string name, string message, bool receipt_sent)
+        {
+            var contacts = ContactHelper.GetContactByPhoneNumber(from.Split('@')[0]);
+            if (contacts != null)
+                await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                {
+                    if (this.ChatPage.Content == null)
+                        this.ChatPage.Navigate(typeof(ChatDetailPage), contacts);
+                });
+        }
+
+
+
+
 
 
         void itemListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -129,7 +143,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
         /// serializable state.</param>
         private void navigationHelper_SaveState(object sender, SaveStateEventArgs e)
         {
-            
+
         }
 
         #region Logical page navigation
@@ -198,7 +212,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
                 // item's details are currently displayed.  Clearing the selection will return to
                 // the item list.  From the user's point of view this is a logical backward
                 // navigation.
-                
+
             }
             else
             {
@@ -247,7 +261,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             navigationHelper.OnNavigatedTo(e);
-            
+            SocketInstance.Instance.OnGetMessage += Instance_OnGetMessage;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -261,9 +275,9 @@ namespace WhatsAPI.UniversalApps.Sample.Views
         private void btnStartChat_Click(object sender, RoutedEventArgs e)
         {
             //this.ChatPage.Navigate(typeof(ChatDetailPage), txtTarget.Text.Trim());
-            
+
         }
 
-       
+
     }
 }

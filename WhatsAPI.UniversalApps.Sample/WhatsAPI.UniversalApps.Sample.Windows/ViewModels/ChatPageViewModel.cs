@@ -29,13 +29,36 @@ namespace WhatsAPI.UniversalApps.Sample.ViewModels
 
         private void OnGetContact()
         {
-           
+
         }
-        
+
+        public void RaisePropertyChangedContactList()
+        {
+
+            OnPropertyChanged(() => Contacts);
+        }
+        private void RefreshContacts()
+        {
+            contacts = ContactHelper.GetAllContacts();
+
+        }
+
+        public void UpdateImage()
+        {
+            foreach (var contact in Contacts)
+            {
+                var item = ContactHelper.GetContactByJid(contact.jid);
+                if(item!=null && item.profileImage != null && contact.profileImage == null)
+                {
+                    contact.profileImage = item.profileImage;
+                }
+            }
+            RaisePropertyChangedContactList();
+        }
         public ChatPageViewModel()
         {
             contacts = new ObservableCollection<Contacts>();
-            Contacts = ContactHelper.GetAllContacts();
+            RefreshContacts();
         }
     }
 }

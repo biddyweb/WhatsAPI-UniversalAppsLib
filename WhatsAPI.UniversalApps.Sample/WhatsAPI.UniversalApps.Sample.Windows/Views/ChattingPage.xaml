@@ -54,13 +54,14 @@
         </Grid>
 
         <!-- Vertical scrolling item list -->
-       <ListView
+        <ListView
             x:Name="itemListView"
             AutomationProperties.AutomationId="ItemsListView"
             AutomationProperties.Name="Items"
             TabIndex="1"
             Grid.Row="1"
             Margin="-10,-10,0,0"
+           VirtualizingStackPanel.VirtualizationMode="Recycling"
             Padding="120,0,0,60"
             ItemsSource="{Binding Contacts}"
             IsSwipeEnabled="False"
@@ -72,9 +73,13 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <!--<Border Background="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}" Width="60" Height="60">
-                            <Image Source="{Binding ImagePath}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Name}"/>
-                        </Border>-->
+                        <Border Background="{StaticResource WhiteColor}" Width="60" Height="60" CornerRadius="50">
+                            <Ellipse HorizontalAlignment="Left" Height="60" Stroke="{StaticResource OrangeColor}" VerticalAlignment="Top" Width="60">
+                                <Ellipse.Fill>
+                                    <ImageBrush Stretch="Uniform" ImageSource="{Binding profileImage}"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                        </Border>
                         <StackPanel Grid.Column="1" Margin="10,0,0,0">
                             <TextBlock Text="{Binding name}" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap" MaxHeight="40"/>
                             <TextBlock Text="{Binding phoneNumber}" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="NoWrap"/>
@@ -98,20 +103,11 @@
 
 
         <!-- Details for selected item -->
-        <ScrollViewer
-            x:Name="itemDetail"
-            AutomationProperties.AutomationId="ItemDetailScrollViewer"
-            Grid.Column="1"
-            Grid.RowSpan="2"
-            Padding="60,0,66,0"
-            DataContext="{Binding SelectedItem, ElementName=itemListView}"
-            HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
-            ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Enabled"
-            ScrollViewer.ZoomMode="Disabled">
 
-            <Frame x:Name="ChatPage"></Frame>
-        </ScrollViewer>
 
+        <Frame x:Name="ChatPage" Grid.Column="1"
+            Grid.RowSpan="2"></Frame>
+     
         <VisualStateManager.VisualStateGroups>
 
             <!-- Visual states reflect the application's view state -->

@@ -15,6 +15,7 @@ using Google.Apis.Http;
 using Google.Apis.Contacts.v3;
 using Google.Apis.Contacts.v3.Data;
 using System.Collections.ObjectModel;
+using Google.Apis.Oauth2.v2;
 
 namespace WhatsAPI.UniversalApps.Sample.Helpers
 {
@@ -26,21 +27,28 @@ namespace WhatsAPI.UniversalApps.Sample.Helpers
         {
             var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
     new Uri("ms-appx:///Assets/client_secrets.json"),
-    new[] { ContactsService.Scope.FullContacts },
+    new[] { ContactsService.Scope.FullContacts, Oauth2Service.Scope.UserinfoProfile, Oauth2Service.Scope.UserinfoEmail },
     "user",
     CancellationToken.None);
-
+            await SyncProfileContactImage();
             var services = new ContactsService(new BaseClientService.Initializer()
             {
 
                 ApplicationName = "WhassApp Windows 8",
                 HttpClientInitializer = credential
             });
+            var oauthSerivce = new Oauth2Service(new BaseClientService.Initializer()
+            {
+
+                ApplicationName = "WhassApp Windows 8",
+                HttpClientInitializer = credential
+            });
+            var userInfo = await oauthSerivce.Userinfo.Get().ExecuteAsync();
             List<string> numberList = new List<string>();
             try
             {
                 PhoneNumbers.PhoneNumberUtil util = PhoneNumbers.PhoneNumberUtil.GetInstance();
-                ContactList response = await services.Contact.Get(credential.UserId).ExecuteAsync();
+                ContactList response = await services.Contact.Get(userInfo.Email).ExecuteAsync();
                 foreach (var c in response.Feed.Entries)
                 {
                     if (c.PhoneNumbers != null)
@@ -62,8 +70,9 @@ namespace WhatsAPI.UniversalApps.Sample.Helpers
 
                         }
                         AddContact(new Contacts() { name = c.Name.Text, phoneNumber = phoneNumber });
-
-                        numberList.Add(phoneNumber);
+                        var check = GetContactByPhoneNumber(phoneNumber);
+                        if (check == null)
+                            numberList.Add(phoneNumber);
                     }
                 }
             }
@@ -71,13 +80,13 @@ namespace WhatsAPI.UniversalApps.Sample.Helpers
             {
 
             }
-
             SocketInstance.Instance.OnGetSyncResult += Instance_OnGetSyncResult;
             SocketInstance.Instance.SendSync(numberList.ToArray(), Libs.Constants.Enums.SyncMode.Delta, Libs.Constants.Enums.SyncContext.Background);
         }
 
         static void Instance_OnGetSyncResult(int index, string sid, Dictionary<string, string> existingUsers, string[] failedNumbers)
         {
+
             foreach (var c in existingUsers)
             {
                 UpdateJid(c.Key, c.Value);
@@ -87,6 +96,7 @@ namespace WhatsAPI.UniversalApps.Sample.Helpers
             {
                 DeleteContact(d);
             }
+
         }
 
         public static void AddContact(Contacts obj)
@@ -132,7 +142,104 @@ namespace WhatsAPI.UniversalApps.Sample.Helpers
             {
                 result.Add(item);
             }
+            return new ObservableCollection<Contacts>(result.OrderBy(x => x.name.ToLower()));
+        }
+
+        public static void SyncProfileContactImage(string jid)
+        {
+
+            var item = GetContactByJid(jid);
+            SocketInstance.Instance.OnGetPhotoPreview += Instance_OnGetPhotoPreview;
+
+            if (item != null && !string.IsNullOrEmpty(item.jid))
+            {
+                SocketInstance.Instance.SendGetPhoto(item.jid, String.Empty, false);
+            }
+
+
+        }
+        static bool isSyncPhotostillRunning = false;
+        public static async Task SyncProfileContactImage()
+        {
+
+
+            SocketInstance.Instance.OnGetPhotoPreview += Instance_OnGetPhotoPreview;
+            SocketInstance.Instance.OnError += Instance_OnError;
+            int i = 0;
+            var syncList = GetAllContacts();
+            foreach (var item in syncList)
+            {
+                i++;
+                while (isSyncPhotostillRunning)
+                {
+                    await Task.Delay(1000);
+                }
+                if (item != null && !string.IsNullOrEmpty(item.jid) && string.IsNullOrEmpty(item.profileImage))
+                {
+                    SocketInstance.Instance.SendGetPhoto(item.jid, String.Empty, false);
+                    isSyncPhotostillRunning = true;
+                    System.Diagnostics.Debug.WriteLine("Proccessing for " + i + " of " + syncList.Count());
+                }
+            }
+
+
+        }
+
+        static void Instance_OnError(string id, string from, int code, string text)
+        {
+            if (id.ToString().Contains("get_photo"))
+            {
+                isSyncPhotostillRunning = false;
+            }
+        }
+
+        public static Contacts GetContactByJid(string jid)
+        {
+            Models.Contacts result = (Models.Contacts)DBProvider.DBConnection.Table<Models.Contacts>().Where(x => x.jid.Contains(jid)).FirstOrDefault();
             return result;
+        }
+
+        public static void UpdateProfileImageByJid(string jid, string path)
+        {
+            Models.Contacts result = GetContactByJid(jid);
+            if (result != null)
+            {
+                result.profileImage = path;
+                DBProvider.DBConnection.Update(result);
+            }
+
+        }
+
+        public static void UpdateProfileImageByPhoneNumber(string phoneNumber, string path)
+        {
+            Models.Contacts result = GetContactByPhoneNumber(phoneNumber);
+            if (result != null)
+            {
+                result.profileImage = path;
+                DBProvider.DBConnection.Update(result);
+            }
+
+        }
+
+        async static void Instance_OnGetPhotoPreview(string from, string id, byte[] data)
+        {
+            isSyncPhotostillRunning = false;
+            var contacts = GetContactByJid(from);
+            string fileName = String.Empty;
+            if (contacts != null && !string.IsNullOrEmpty(contacts.name))
+            {
+                fileName = WhatsAPI.UniversalApps.Libs.Utils.Common.FileHelper.RemoveSpaceFromFileName(contacts.name) + ".jpg";
+            }
+            else
+            {
+                fileName = from.Split('@')[0] + ".jpg";
+            }
+            var file = await WhatsAPI.UniversalApps.Libs.Utils.Common.FileHelper.SaveFileFromByteArray(data, fileName, "ProfileCache");
+            if (file != null)
+            {
+                await Task.Run(() =>
+                UpdateProfileImageByJid(from, file.Path));
+            }
         }
     }
 }

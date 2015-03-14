@@ -5,6 +5,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using WhatsAPI.UniversalApps.Libs.Core.Exceptions;
+using Windows.Foundation;
 using Windows.Networking;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
@@ -72,7 +73,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
             this.whatsPort = Constants.Information.WhatsPort;
             this.incomplete_message = new List<byte>();
         }
-
+        private bool isTryingtoConnect = false;
         /// <summary>
         /// Connect to the whatsapp server
         /// </summary>
@@ -83,7 +84,7 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                 try
                 {
 
-
+                    isTryingtoConnect = true;
                     this.socket = new StreamSocket();
                     this.socket.Control.KeepAlive = true;
                     _writePacket = new DataWriter(this.socket.OutputStream);
@@ -96,10 +97,12 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                     //HandleConnect();
                     _transferredSize = 0;
                     IsConnected = true;
+                    isTryingtoConnect = false;
 
                 }
                 catch (Exception ex)
                 {
+                    isTryingtoConnect = false;
                     throw new ConnectionException("Cannot connect");
                 }
             });
@@ -262,7 +265,9 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
 
                                        try
                                        {
-                                           uint bytesRead = await _readerPacket.LoadAsync(length);
+                                           IAsyncOperation<uint> taskLoad = _readerPacket.LoadAsync(length);
+                                           taskLoad.AsTask().Wait();
+                                           uint bytesRead = taskLoad.GetResults();
                                            if (bytesRead == 0)
                                                return null;
                                            if (_readerPacket.UnconsumedBufferLength < length)
@@ -279,7 +284,14 @@ namespace WhatsAPI.UniversalApps.Libs.Core.Connection
                                    }
                                    catch (Exception ex)
                                    {
-                                       throw new ConnectionException("Connection Lost");
+                                       if (ex.Message.Contains("The operation identifier is not valid."))
+                                       {
+                                           throw ex;
+                                       }
+                                       else
+                                       {
+                                           throw new ConnectionException("Connection Lost");
+                                       }
                                    }
                                });
 
