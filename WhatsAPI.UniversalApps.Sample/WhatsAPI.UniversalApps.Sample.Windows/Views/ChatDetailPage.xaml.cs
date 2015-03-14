@@ -8,6 +8,8 @@ using WhatsAPI.UniversalApps.Libs.Models;
 using WhatsAPI.UniversalApps.Libs.Utils.Common;
 using WhatsAPI.UniversalApps.Sample.Helpers;
 using WhatsAPI.UniversalApps.Sample.Models;
+using WhatsAPI.UniversalApps.Sample.Repositories;
+using WhatsAPI.UniversalApps.Sample.ViewModels;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
@@ -29,6 +31,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace WhatsAPI.UniversalApps.Sample.Views
 {
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -38,7 +41,7 @@ namespace WhatsAPI.UniversalApps.Sample.Views
         private bool isTyping;
         private DispatcherTimer timerTyping;
         private bool isGroup = false;
-
+        private static Contacts _contacts;
         public ChatDetailPage()
         {
             this.InitializeComponent();
@@ -52,17 +55,29 @@ namespace WhatsAPI.UniversalApps.Sample.Views
 
         async void Instance_OnConnectSuccess()
         {
+
             await SocketInstance.Instance.Login();
         }
 
         void Instance_OnGetMessageImage(Libs.Base.ProtocolTreeNode mediaNode, string from, string id, string fileName, int fileSize, string url, byte[] preview)
         {
-            this.AddNewImage(this.user.Nickname, url);
+            if (this.user.Jid.Contains(from))
+            {
+                this.AddNewImage(this.user.Nickname, url);
+            }
+            var messages = new Messages() { jid = this.user.Jid, messages = url };
+            DBProvider.DBConnection.Insert(messages);
         }
 
         private void Instance_OnGetMessage(Libs.Base.ProtocolTreeNode messageNode, string from, string id, string name, string message, bool receipt_sent)
         {
-            this.AddNewText(this.user.Nickname, message);
+            if (this.user.Jid.Contains(from))
+            {
+
+                this.AddNewText(this.user.Nickname, message);
+            }
+            var messages = new Messages() { jid = this.user.Jid, messages = message };
+            DBProvider.DBConnection.Insert(messages);
         }
 
         void timerTyping_Tick(object sender, object e)
@@ -76,14 +91,28 @@ namespace WhatsAPI.UniversalApps.Sample.Views
             SocketInstance.Instance.SendPaused(this.user.GetFullJid());
             this.timerTyping.Stop();
         }
+        private static ChatDetailPageViewModel defaultViewModel = new ChatDetailPageViewModel(_contacts);
+
+        /// <summary>
+        /// This can be changed to a strongly typed view model.
+        /// </summary>
+        public static ChatDetailPageViewModel DefaultViewModel
+        {
+            get { return defaultViewModel; }
+            set
+            {
+                defaultViewModel = value;
+            }
+        }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+
             if (e.Parameter != null)
             {
                 Contacts contacts = e.Parameter as Contacts;
                 string server = "";
-
+                DefaultViewModel.SetContacts(contacts);
                 if (contacts.jid != null)
                 {
                     if (contacts.jid.Contains("-"))
@@ -120,41 +149,51 @@ namespace WhatsAPI.UniversalApps.Sample.Views
             base.OnNavigatedTo(e);
         }
 
+        private void LoadOldConversation()
+        {
+            var messageList = DBProvider.DBConnection.Table<Messages>().Where(x => x.jid == this.user.Jid).Take(25);
+            foreach (var message in messageList)
+            {
+                AddNewText(this.user.Nickname, message.messages);
+
+            }
+        }
         private void processChat()
         {
             SocketInstance.Instance.SendQueryLastOnline(this.user.Jid);
             SocketInstance.Instance.SendPresenceSubscriptionRequest(this.user.Jid);
+            LoadOldConversation();
         }
         private async void AddNewText(string from, string text)
         {
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-             {
-                 var p = new Paragraph();
-                 p.Inlines.Add(new Run() { Text = string.Format("{0}: {1}{2}", from, text, Environment.NewLine) });
-                 this.tbChatWindow.Blocks.Add(p);
-             });
+               {
+                   DefaultViewModel.Messages.Add(new Messages() { jid = from, messages = text });
+               });
         }
 
         private async void AddNewImage(string from, string text)
         {
-            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-            {
-                Image image = new Image()
-                {
-                    Source = new BitmapImage(new Uri(text)),
-                    Width = 120,
-                    Height = 120
-                };
+            //{
+            //    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+            //    {
+            //        Image image = new Image()
+            //        {
+            //            Source = new BitmapImage(new Uri(text)),
+            //            Width = 120,
+            //            Height = 120
+            //        };
 
-                var inline = new InlineUIContainer();
-                inline.Child = image;
+            //        var inline = new InlineUIContainer();
+            //        inline.Child = image;
 
-                var p = new Paragraph();
-                p.Inlines.Add(new Run() { Text = string.Format("{0}: {1}", from, Environment.NewLine) });
-                p.Inlines.Add(inline);
-                p.Inlines.Add(new Run() { Text = string.Format("{0}", Environment.NewLine) });
-                this.tbChatWindow.Blocks.Add(p);
-            });
+            //        var p = new Paragraph();
+            //        p.Inlines.Add(new Run() { Text = string.Format("{0}: {1}", from, Environment.NewLine) });
+            //        p.Inlines.Add(inline);
+            //        p.Inlines.Add(new Run() { Text = string.Format("{0}", Environment.NewLine) });
+            //        this.tbChatWindow.Blocks.Add(p);
+            //    });
+            AddNewText(from, text);
         }
 
         private void txtChat_TextChanged(object sender, TextChangedEventArgs e)
@@ -259,14 +298,14 @@ namespace WhatsAPI.UniversalApps.Sample.Views
                                         await dialog.ShowAsync();
                                         return;
                                     }
-                                     
+
                                     var byteFile = await WhatsAPI.UniversalApps.Libs.Utils.Common.FileHelper.ConvertStorageFileToByteArray(file);
                                     SocketInstance.Instance.SendMessageVideo(this.user.GetFullJid(), byteFile, Enums.VideoType.MP4);
                                 }
                             }
                             break;
 
-                       
+
                     }
                 }
             }

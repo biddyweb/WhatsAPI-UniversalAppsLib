@@ -103,20 +103,11 @@
 
 
         <!-- Details for selected item -->
-        <ScrollViewer
-            x:Name="itemDetail"
-            AutomationProperties.AutomationId="ItemDetailScrollViewer"
-            Grid.Column="1"
-            Grid.RowSpan="2"
-            Padding="60,0,66,0"
-            DataContext="{Binding SelectedItem, ElementName=itemListView}"
-            HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
-            ScrollViewer.HorizontalScrollMode="Disabled" ScrollViewer.VerticalScrollMode="Enabled"
-            ScrollViewer.ZoomMode="Disabled">
 
-            <Frame x:Name="ChatPage"></Frame>
-        </ScrollViewer>
 
+        <Frame x:Name="ChatPage" Grid.Column="1"
+            Grid.RowSpan="2"></Frame>
+     
         <VisualStateManager.VisualStateGroups>
 
             <!-- Visual states reflect the application's view state -->

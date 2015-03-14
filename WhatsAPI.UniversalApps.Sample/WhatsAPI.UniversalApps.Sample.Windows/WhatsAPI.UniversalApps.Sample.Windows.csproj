@@ -115,6 +115,12 @@
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="Constants\ConfigKey.cs" />
+    <Compile Include="Controls\ChatBubble.xaml.cs">
+      <DependentUpon>ChatBubble.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ChatRichTextBlock.xaml.cs">
+      <DependentUpon>ChatRichTextBlock.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\ContactHelper.cs" />
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -127,6 +133,7 @@
     <Compile Include="Repositories\DBProvider.cs" />
     <Compile Include="Services\IRequestProvider.cs" />
     <Compile Include="SocketInstance.cs" />
+    <Compile Include="ViewModels\ChatDetailPageViewModel.cs" />
     <Compile Include="ViewModels\ChatPageViewModel.cs" />
     <Compile Include="Views\ChatDetailPage.xaml.cs">
       <DependentUpon>ChatDetailPage.xaml</DependentUpon>
@@ -162,6 +169,14 @@
     <Content Include="Assets\StoreLogo.scale-100.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\ChatBubble.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ChatRichTextBlock.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
